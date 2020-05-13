@@ -1,0 +1,14 @@
+{
+  "$schema": "config.schema.json",
+
+  "network": {
+    "listenPort": 9861,
+    "workerPoolSize": 16
+  },
+
+  "spotify": {
+    "clientId": "",
+    "clientSecret": "",
+    "redirectUri": "http://blacklight.so/redirect-spotify"
+  }
+}

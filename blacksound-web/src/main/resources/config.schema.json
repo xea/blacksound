@@ -1,0 +1,55 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://blacklight.so/blacksound/config.schema.json",
+    "title": "Blacksound Configuration",
+    "description": "Blacksound application configuration",
+    "type": "object",
+
+    "properties": {
+        "network": {
+            "description": "Network-related settings",
+            "type": "object",
+            "properties": {
+                "listenPort": {
+                    "description": "TCP port for the server application to listen on",
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 65565
+                },
+                "workerPoolSize": {
+                    "description": "The amount of worker threads the runtime spawns for processing requests",
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1024
+                }
+            }
+        },
+        "spotify": {
+            "description": "Spotify settings",
+            "type": "object",
+            "properties": {
+                "clientId": {
+                    "description": "Spotify ID associated with this application",
+                    "type": "string"
+                },
+                "clientSecret": {
+                    "description": "Spotify secret identifying this registered instance",
+                    "type": "string"
+                },
+                "redirectUri": {
+                    "description": "The URI the Spotify authenticator should redirect to after an authentication attempt",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "clientId",
+                "clientSecret",
+                "redirectUri"
+            ]
+        }
+    },
+
+    "required": [
+      "spotify"
+    ]
+}
