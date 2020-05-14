@@ -1,6 +1,7 @@
 package so.blacklight.blacksound.config;
 
 import io.vavr.control.Option;
+import so.blacklight.blacksound.spotify.SpotifyConfig;
 
 public class ServerConfig {
 
@@ -8,7 +9,7 @@ public class ServerConfig {
 
     private final SpotifyConfig spotify;
 
-    public ServerConfig() {
+    private ServerConfig() {
         network = null;
         spotify = null;
     }
@@ -18,6 +19,6 @@ public class ServerConfig {
     }
 
     public SpotifyConfig getSpotifyConfig() {
-        return Option.of(spotify).getOrElse(SpotifyConfig::new);
+        return spotify;
     }
 }

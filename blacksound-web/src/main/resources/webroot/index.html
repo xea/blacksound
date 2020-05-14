@@ -14,6 +14,12 @@
     <div id="app">
         {{ message }}
 
+        <div id="anonymous" v-on:click="loadSettings">
+            Click here to log in using your Spotify account
+        </div>
+
+        <a v-bind:href="redirectUri">Clicky click</a>
+
         <div id="next-song" class="button" v-on:click="nextSong">Next song</div>
 
     </div>

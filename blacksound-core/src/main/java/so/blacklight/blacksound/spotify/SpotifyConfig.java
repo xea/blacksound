@@ -1,4 +1,6 @@
-package so.blacklight.blacksound.config;
+package so.blacklight.blacksound.spotify;
+
+import com.wrapper.spotify.SpotifyApi;
 
 import java.net.URI;
 
@@ -27,15 +29,12 @@ public class SpotifyConfig {
         this.redirectUri = redirectUri;
     }
 
-    public String getClientId() {
-        return clientId;
-    }
-
-    public String getClientSecret() {
-        return clientSecret;
-    }
-
     public URI getRedirectUri() {
         return redirectUri;
+    }
+
+    public SpotifyApi.Builder setupSecrets(final SpotifyApi.Builder builder) {
+        return builder.setClientId(clientId)
+                .setClientSecret(clientSecret);
     }
 }
