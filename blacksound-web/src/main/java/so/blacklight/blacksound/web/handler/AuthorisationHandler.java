@@ -12,6 +12,6 @@ public class AuthorisationHandler implements VertxHandler {
 
     @Override
     public void handle(RoutingContext routingContext) {
-        final CompletableFuture<URI> uriCompletableFuture = core.requestAuthorisation();
+        //final CompletableFuture<URI> uriCompletableFuture = core.requestAuthorisationURI();
     }
 }

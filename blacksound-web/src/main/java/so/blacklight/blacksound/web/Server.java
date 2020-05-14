@@ -71,9 +71,9 @@ public class Server {
         router.route("/").handler(StaticHandler.create());
         router.route("/favicon.ico").handler(FaviconHandler.create());
         router.route("/static/*").handler(StaticHandler.create());
-        router.route("/spotify-callback").handler(new CallbackHandler());
+        router.route("/spotify-redirect").handler(new CallbackHandler(core, vertx));
         router.route("/api/next-song").handler(new NextSongHandler());
-        router.route("/api/redirect-uri").handler(new RedirectURIHandler(core, vertx));
+        router.route("/api/redirect-uri").handler(new RedirectURIHandler(core));
 
         // TODO we'll need to hide this call behind an authorization check once we've got users
         router.route("/api/shutdown").handler(new ShutDownHandler(this));

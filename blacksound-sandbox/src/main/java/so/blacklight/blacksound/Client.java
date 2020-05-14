@@ -20,12 +20,10 @@ public class Client {
                 .setRedirectUri(redirectUri)
                 .build();
 
-        /*
         final var authRequest = api.authorizationCodeUri()
                 .scope("user-read-playback-state streaming playlist-read-collaborative user-modify-playback-state user-read-currently-playing")
                 .build();
         final var authResponse = authRequest.execute();
-         */
 
         /*
         final var code = "AQC7u9J9y5hqX0R32WbDDvwgGwkNV-iCz55x7qIr2NRRMauK32AJiJymPlO_QgJUjwXUrXJNiIOgAyN4kEzy64NulVJ18nN_hx8sWBdPUqLR7Z3noWo01lnFmiA7Kw_wdjFsccj_Lh4-fC_WqvprfqbpiGg4IOScxvW156UQ26ytPblHd3fkxTCEYfZbxdlr3iti0wYO6szmHYZKCh9hJqTO4z4J8ZO6kYdbo5sosJslZnGjUNsljR6HkXqlnqELRjNanOCi2Fhb7GBVsKIGsxI08VPI_827JA2akPn1m1RSnb_cJlZn99wPIHgyl4YMDxdXBWzwck04yqP2HIR2BvGGdeZHLozuCwwWqD7RTXvHFHUh2QM";

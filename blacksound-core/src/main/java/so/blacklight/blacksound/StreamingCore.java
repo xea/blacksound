@@ -1,6 +1,8 @@
 package so.blacklight.blacksound;
 
 import com.wrapper.spotify.SpotifyApi;
+import com.wrapper.spotify.SpotifyHttpManager;
+import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 import so.blacklight.blacksound.spotify.SpotifyConfig;
 
 import java.net.URI;
@@ -9,17 +11,17 @@ import java.util.concurrent.CompletableFuture;
 public class StreamingCore {
 
     private final SpotifyApi spotifyApi;
-    private final SpotifyConfig config;
 
     public StreamingCore(final SpotifyConfig config) {
-        this.config = config;
+        final var uri = SpotifyHttpManager.makeUri(config.getRedirectUri().toString());
 
         spotifyApi = config.setupSecrets(new SpotifyApi.Builder())
                 .setRedirectUri(config.getRedirectUri())
                 .build();
+
     }
 
-    public CompletableFuture<URI> requestAuthorisation() {
+    public URI requestAuthorisationURI() {
         // Not sure if this needs to be more dynamic
         final var scopeItems = new String[] {
                 "user-read-playback-state",
@@ -34,6 +36,13 @@ public class StreamingCore {
                 .scope(scope)
                 .build();
 
-        return authCodeUriRequest.executeAsync();
+        // Maybe we should consider caching the URI instead of recalculating it every time
+        return authCodeUriRequest.execute();
+    }
+
+    public CompletableFuture<AuthorizationCodeCredentials> requestAuthorisation(final String code) {
+        final var authCodeRequest = spotifyApi.authorizationCode(code).build();
+
+        return authCodeRequest.executeAsync();
     }
 }
