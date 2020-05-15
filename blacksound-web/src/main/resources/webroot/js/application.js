@@ -15,6 +15,18 @@ let _ = new Vue({
                 .then(function(response) {
                     console.log(response);
                 })
+        },
+        playStream: function() {
+            fetch("/api/play", { method: "POST" })
+                .then(function(response) {
+                    console.log(response);
+                })
+        },
+        status: function() {
+            fetch("/api/status")
+                .then(function(response) {
+                    console.log(response);
+                })
         }
     }
 

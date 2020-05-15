@@ -3,12 +3,19 @@ package so.blacklight.blacksound.web.handler;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.StreamingCore;
+import so.blacklight.blacksound.Subscriber;
+
+import java.util.concurrent.CompletableFuture;
 
 public class CallbackHandler implements Handler<RoutingContext> {
 
     private final Vertx vertx;
     private final StreamingCore core;
+
+    private final Logger log = LogManager.getLogger(getClass());
 
     public CallbackHandler(final StreamingCore core, final Vertx vertx) {
         this.core = core;
@@ -25,7 +32,27 @@ public class CallbackHandler implements Handler<RoutingContext> {
         core.requestAuthorisation(code).thenAcceptAsync(credentials -> {
             response.putHeader("Content-Type", "text/plain");
 
+            final var subscriber = new Subscriber(credentials);
+
+            core.subscribe(subscriber);
+
+            log.info("Registered new subscriber with ID {}", subscriber.getId());
+
             response.end("Accepted credentials, will expire in " + credentials.getExpiresIn());
         }, vertx.nettyEventLoopGroup());
+        /*
+        CompletableFuture.runAsync(() -> {
+            response.putHeader("Content-Type", "text/plain");
+
+            final var subscriber = new Subscriber("", "");
+
+            core.subscribe(subscriber);
+
+            log.info("Registered new subscriber with ID {}", subscriber.getId());
+
+            response.end("asdfasdf");
+
+        }, vertx.nettyEventLoopGroup());
+         */
     }
 }

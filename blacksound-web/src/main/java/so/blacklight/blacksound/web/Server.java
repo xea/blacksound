@@ -18,10 +18,7 @@ import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.StreamingCore;
 import so.blacklight.blacksound.config.ConfigLoader;
 import so.blacklight.blacksound.config.ServerConfig;
-import so.blacklight.blacksound.web.handler.CallbackHandler;
-import so.blacklight.blacksound.web.handler.NextSongHandler;
-import so.blacklight.blacksound.web.handler.RedirectURIHandler;
-import so.blacklight.blacksound.web.handler.ShutDownHandler;
+import so.blacklight.blacksound.web.handler.*;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -73,7 +70,9 @@ public class Server {
         router.route("/static/*").handler(StaticHandler.create());
         router.route("/spotify-redirect").handler(new CallbackHandler(core, vertx));
         router.route("/api/next-song").handler(new NextSongHandler());
+        router.route("/api/play").handler(new PlayHandler(core));
         router.route("/api/redirect-uri").handler(new RedirectURIHandler(core));
+        router.route("/api/status").handler(new StatusHandler(core));
 
         // TODO we'll need to hide this call behind an authorization check once we've got users
         router.route("/api/shutdown").handler(new ShutDownHandler(this));

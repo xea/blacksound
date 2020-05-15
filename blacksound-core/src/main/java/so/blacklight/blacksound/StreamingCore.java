@@ -1,20 +1,25 @@
 package so.blacklight.blacksound;
 
 import com.wrapper.spotify.SpotifyApi;
-import com.wrapper.spotify.SpotifyHttpManager;
+import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredentials;
+import org.apache.hc.core5.http.ParseException;
 import so.blacklight.blacksound.spotify.SpotifyConfig;
 
+import java.io.IOException;
 import java.net.URI;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class StreamingCore {
 
     private final SpotifyApi spotifyApi;
 
-    public StreamingCore(final SpotifyConfig config) {
-        final var uri = SpotifyHttpManager.makeUri(config.getRedirectUri().toString());
+    private final List<Subscriber> subscribers = new CopyOnWriteArrayList<>();
 
+    public StreamingCore(final SpotifyConfig config) {
         spotifyApi = config.setupSecrets(new SpotifyApi.Builder())
                 .setRedirectUri(config.getRedirectUri())
                 .build();
@@ -44,5 +49,38 @@ public class StreamingCore {
         final var authCodeRequest = spotifyApi.authorizationCode(code).build();
 
         return authCodeRequest.executeAsync();
+    }
+
+    public void subscribe(final Subscriber subscriber) {
+        subscribers.add(subscriber);
+    }
+
+    public void unsubscribe(final UUID uuid) {
+        subscribers.removeIf(subscriber -> subscriber.getId().equals(uuid));
+    }
+
+    public void play() {
+        final var trackId = "spotify:album:5zT1JLIj9E57p3e1rFm9Uq"; //"spotify:track:0WSRrGVg1gO33MKIBPgBV2";
+
+        subscribers.forEach(subscriber -> {
+            final var playRequest = subscriber.getApi()
+                    .startResumeUsersPlayback()
+                    .context_uri(trackId)
+                    .build();
+
+            try {
+                final String result = playRequest.execute();
+
+                System.out.println("Result: " + result);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            } catch (SpotifyWebApiException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("---");
+        });
     }
 }
