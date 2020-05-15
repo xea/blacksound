@@ -7,8 +7,8 @@
   },
 
   "spotify": {
-    "clientId": "",
-    "clientSecret": "",
-    "redirectUri": "http://blacklight.so/redirect-spotify"
+    "clientId": "<INSERT CLIENT ID>",
+    "clientSecret": "<INSERT CLIENT SECRET>",
+    "redirectUri": "http://blacklight.so/spotify-redirect"
   }
 }
