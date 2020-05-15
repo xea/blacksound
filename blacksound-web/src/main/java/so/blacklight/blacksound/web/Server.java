@@ -1,5 +1,6 @@
 package so.blacklight.blacksound.web;
 
+import io.vavr.control.Try;
 import io.vavr.control.Validation;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
@@ -20,6 +21,8 @@ import so.blacklight.blacksound.config.ConfigLoader;
 import so.blacklight.blacksound.config.ServerConfig;
 import so.blacklight.blacksound.web.handler.*;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.concurrent.CountDownLatch;
 
 public class Server {
@@ -91,8 +94,15 @@ public class Server {
     public static void main(String[] args) {
         log.info("Starting server");
 
-        final var serverHandle = ConfigLoader.getDefaultLoader()
-                .load()
+        final var configLoader = ConfigLoader.getDefaultLoader();
+
+        final var serverHandle = Try.of(() -> new FileInputStream(new File("config.json")))
+                .toValidation()
+                // Attempt to load external config first, using the above input stream
+                .map(configLoader::load)
+                .mapError(Server::logFallback)
+                // Failing that, fall back to default (this load() is the no-argument version)
+                .getOrElse(configLoader::load)
                 .map(Server::new)
                 .mapError(ServerError::from)
                 .flatMap(Server::start);
@@ -108,6 +118,13 @@ public class Server {
             log.error("Failed to start server: {}", serverHandle.getError().getMessage());
         }
     }
+
+    private static Throwable logFallback(Throwable throwable) {
+        log.debug("Failed to load configuration, falling back. Reason: {}", throwable.getMessage());
+
+        return throwable;
+    }
+
 
     public void shutDown() {
         vertx.close();

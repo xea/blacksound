@@ -4,6 +4,8 @@ import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 import org.apache.hc.core5.http.ParseException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.spotify.SpotifyConfig;
 
 import java.io.IOException;
@@ -18,6 +20,7 @@ public class StreamingCore {
     private final SpotifyApi spotifyApi;
 
     private final List<Subscriber> subscribers = new CopyOnWriteArrayList<>();
+    private final Logger log = LogManager.getLogger(getClass());
 
     public StreamingCore(final SpotifyConfig config) {
         spotifyApi = config.setupSecrets(new SpotifyApi.Builder())
@@ -60,7 +63,7 @@ public class StreamingCore {
     }
 
     public void play() {
-        final var trackId = "spotify:album:5zT1JLIj9E57p3e1rFm9Uq"; //"spotify:track:0WSRrGVg1gO33MKIBPgBV2";
+        final var trackId = "spotify:album:5zT1JLIj9E57p3e1rFm9Uq";
 
         subscribers.forEach(subscriber -> {
             final var playRequest = subscriber.getApi()
@@ -72,15 +75,9 @@ public class StreamingCore {
                 final String result = playRequest.execute();
 
                 System.out.println("Result: " + result);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            } catch (SpotifyWebApiException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (ParseException | IOException | SpotifyWebApiException e) {
+                log.error("Error while playing song", e);
             }
-
-            System.out.println("---");
         });
     }
 }

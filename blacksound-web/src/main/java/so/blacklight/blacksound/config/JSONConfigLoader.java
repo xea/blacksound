@@ -18,7 +18,12 @@ public class JSONConfigLoader implements ConfigLoader {
 
     @Override
     public Validation<ConfigError, ServerConfig> load() {
-        return Option.of(JSONConfigLoader.class.getResourceAsStream(DEFAULT_CONFIG_LOCATION))
+        return load(JSONConfigLoader.class.getResourceAsStream(DEFAULT_CONFIG_LOCATION));
+    }
+
+    @Override
+    public Validation<ConfigError, ServerConfig> load(final InputStream inputStream) {
+        return Option.of(inputStream)
                 .flatMap(Option::of)
                 .toValidation(new ConfigError(ConfigErrorKind.FILE_NOT_FOUND))
                 .flatMap(this::toJson);

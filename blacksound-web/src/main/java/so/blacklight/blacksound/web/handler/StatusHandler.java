@@ -1,21 +1,18 @@
 package so.blacklight.blacksound.web.handler;
 
 import io.vertx.ext.web.RoutingContext;
-import so.blacklight.blacksound.StreamingCore;
 
 public class StatusHandler implements VertxHandler {
 
-    private final StreamingCore core;
-
-    public StatusHandler(StreamingCore core) {
-        this.core = core;
+    public StatusHandler() {
+        // Yet to be populated
     }
 
     @Override
     public void handle(RoutingContext routingContext) {
         final var response = routingContext.response();
 
-        final var status = new StatusResponse(core);
+        final var status = new StatusResponse();
 
         response.end(asJson(status));
     }
@@ -24,7 +21,7 @@ public class StatusHandler implements VertxHandler {
 
         public final String status;
 
-        public StatusResponse(final StreamingCore core) {
+        public StatusResponse() {
             status = "ok";
         }
     }

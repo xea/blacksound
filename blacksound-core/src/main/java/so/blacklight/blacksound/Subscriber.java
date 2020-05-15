@@ -37,4 +37,8 @@ public class Subscriber {
     public SpotifyApi getApi() {
         return api;
     }
+
+    public boolean needRefresh() {
+        return Instant.now().isAfter(expires);
+    }
 }
