@@ -81,6 +81,7 @@ public class Server {
     }
 
     public Validation<ServerError, ServerHandle> start() {
+        log.info("Listening on port {}", httpServer.actualPort());
         httpServer.listen();
 
         log.info("Listening on port {}", httpServer.actualPort());
