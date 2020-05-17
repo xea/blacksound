@@ -2,7 +2,8 @@ let _ = new Vue({
     el: '#app',
     data: {
         message: "Vue is working",
-        redirectUri: undefined
+        redirectUri: undefined,
+        trackUri: undefined,
     },
     methods: {
         loadSettings: function() {
@@ -17,10 +18,16 @@ let _ = new Vue({
                 })
         },
         playStream: function() {
-            fetch("/api/play", { method: "POST" })
-                .then(function(response) {
-                    console.log(response);
-                })
+            let request = {
+                trackUri: this.trackUri
+            };
+
+            fetch("/api/play", {
+                method: "POST",
+                body: JSON.stringify(request)
+            }).then(function(response) {
+                console.log(response);
+            })
         },
         status: function() {
             fetch("/api/status")

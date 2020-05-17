@@ -62,13 +62,11 @@ public class StreamingCore {
         subscribers.removeIf(subscriber -> subscriber.getId().equals(uuid));
     }
 
-    public void play() {
-        final var trackId = "spotify:album:5zT1JLIj9E57p3e1rFm9Uq";
-
+    public void play(final String trackUri) {
         subscribers.forEach(subscriber -> {
             final var playRequest = subscriber.getApi()
                     .startResumeUsersPlayback()
-                    .context_uri(trackId)
+                    .context_uri(trackUri)
                     .build();
 
             try {

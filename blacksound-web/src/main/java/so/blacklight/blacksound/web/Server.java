@@ -9,10 +9,7 @@ import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.handler.FaviconHandler;
-import io.vertx.ext.web.handler.LoggerHandler;
-import io.vertx.ext.web.handler.SessionHandler;
-import io.vertx.ext.web.handler.StaticHandler;
+import io.vertx.ext.web.handler.*;
 import io.vertx.ext.web.sstore.LocalSessionStore;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -73,9 +70,9 @@ public class Server {
         router.route("/static/*").handler(StaticHandler.create());
         router.route("/spotify-redirect").handler(new CallbackHandler(core, vertx));
         router.route("/api/next-song").handler(new NextSongHandler());
-        router.route("/api/play").handler(new PlayHandler(core));
+        router.route("/api/play").handler(BodyHandler.create()).handler(new PlayHandler(core));
         router.route("/api/redirect-uri").handler(new RedirectURIHandler(core));
-        router.route("/api/status").handler(new StatusHandler(core));
+        router.route("/api/status").handler(new StatusHandler());
 
         // TODO we'll need to hide this call behind an authorization check once we've got users
         router.route("/api/shutdown").handler(new ShutDownHandler(this));
