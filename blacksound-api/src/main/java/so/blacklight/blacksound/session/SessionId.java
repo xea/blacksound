@@ -26,6 +26,13 @@ public class SessionId implements Id<Session, UUID> {
     }
 
     @Override
+    public String toString() {
+        return "SessionId{" +
+                "id=" + id.toString() +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

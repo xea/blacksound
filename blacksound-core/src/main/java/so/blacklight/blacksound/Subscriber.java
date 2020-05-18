@@ -2,19 +2,20 @@ package so.blacklight.blacksound;
 
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredentials;
+import so.blacklight.blacksound.session.Session;
+import so.blacklight.blacksound.session.SessionId;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.UUID;
 
-public class Subscriber {
+public class Subscriber implements Session {
 
-    private final UUID id;
+    private final SessionId id;
     private final SpotifyApi api;
-    private final Instant expires;
+    private Instant expires;
 
     public Subscriber(final String accessToken, final String refreshToken, final Instant expires) {
-        this.id = UUID.randomUUID();
+        this.id = new SessionId();
         this.expires = expires;
 
         api = new SpotifyApi.Builder()
@@ -30,12 +31,23 @@ public class Subscriber {
                 Instant.now().plus(credentials.getExpiresIn(), ChronoUnit.SECONDS));
     }
 
-    public UUID getId() {
+    @Override
+    public SessionId getId() {
         return id;
     }
 
     public SpotifyApi getApi() {
         return api;
+    }
+
+    public void refreshToken() {
+        final var refreshRequest = api.authorizationCodeRefresh().build();
+
+        refreshRequest.executeAsync().thenAcceptAsync(credentials -> {
+            api.setAccessToken(credentials.getAccessToken());
+            api.setRefreshToken(credentials.getRefreshToken());
+            expires = Instant.now().plus(credentials.getExpiresIn(), ChronoUnit.SECONDS);
+        });
     }
 
     public boolean needRefresh() {

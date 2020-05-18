@@ -1,7 +1,7 @@
 let _ = new Vue({
     el: '#app',
     data: {
-        message: "Vue is working",
+        statusMessage: "",
         redirectUri: undefined,
         trackUri: undefined,
     },

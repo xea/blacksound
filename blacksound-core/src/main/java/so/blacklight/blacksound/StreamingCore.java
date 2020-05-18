@@ -6,20 +6,21 @@ import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredential
 import org.apache.hc.core5.http.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import so.blacklight.blacksound.session.SessionId;
+import so.blacklight.blacksound.session.SessionStore;
+import so.blacklight.blacksound.session.impl.FileSessionStore;
 import so.blacklight.blacksound.spotify.SpotifyConfig;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class StreamingCore {
 
     private final SpotifyApi spotifyApi;
 
-    private final List<Subscriber> subscribers = new CopyOnWriteArrayList<>();
+    private final SessionStore<Subscriber> sessionStore = new FileSessionStore();
     private final Logger log = LogManager.getLogger(getClass());
 
     public StreamingCore(final SpotifyConfig config) {
@@ -55,15 +56,11 @@ public class StreamingCore {
     }
 
     public void subscribe(final Subscriber subscriber) {
-        subscribers.add(subscriber);
-    }
-
-    public void unsubscribe(final UUID uuid) {
-        subscribers.removeIf(subscriber -> subscriber.getId().equals(uuid));
+        final var sessionId = sessionStore.add(subscriber);
     }
 
     public void play(final String trackUri) {
-        subscribers.forEach(subscriber -> {
+        sessionStore.forEach(subscriber -> {
             final var playRequest = subscriber.getApi()
                     .startResumeUsersPlayback()
                     .context_uri(trackUri)

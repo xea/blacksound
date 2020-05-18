@@ -1,16 +1,13 @@
 package so.blacklight.blacksound.session;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
-public interface SessionStore {
+public interface SessionStore<T extends Session> {
 
-    Optional<Session> getSession(final SessionId sessionId);
+    SessionId add(T session);
 
-    /**
-     * Retrieve a session by its session ID or create a new session.
-     *
-     * @param sessionId the ID of the session to be loaded or created
-     * @return the requested session
-     */
-    Session getOrCreateSession(final SessionId sessionId);
+    void remove(SessionId sessionId);
+
+    void forEach(Consumer<T> sessionConsumer);
 }

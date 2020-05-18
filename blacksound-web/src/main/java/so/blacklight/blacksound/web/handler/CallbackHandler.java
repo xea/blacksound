@@ -8,8 +8,6 @@ import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.StreamingCore;
 import so.blacklight.blacksound.Subscriber;
 
-import java.util.concurrent.CompletableFuture;
-
 public class CallbackHandler implements Handler<RoutingContext> {
 
     private final Vertx vertx;

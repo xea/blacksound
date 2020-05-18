@@ -68,9 +68,11 @@ public class Server {
         router.route("/").handler(StaticHandler.create());
         router.route("/favicon.ico").handler(FaviconHandler.create());
         router.route("/static/*").handler(StaticHandler.create());
+        // This is where Spotify will call back once the authentication is done
         router.route("/spotify-redirect").handler(new CallbackHandler(core, vertx));
         router.route("/api/next-song").handler(new NextSongHandler());
         router.route("/api/play").handler(BodyHandler.create()).handler(new PlayHandler(core));
+        // This exposes our redirect URI to the frontend
         router.route("/api/redirect-uri").handler(new RedirectURIHandler(core));
         router.route("/api/status").handler(new StatusHandler());
 
