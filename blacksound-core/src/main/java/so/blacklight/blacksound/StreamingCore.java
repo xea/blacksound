@@ -55,8 +55,8 @@ public class StreamingCore {
         return authCodeRequest.executeAsync();
     }
 
-    public void subscribe(final Subscriber subscriber) {
-        final var sessionId = sessionStore.add(subscriber);
+    public SessionId register(final Subscriber subscriber) {
+        return sessionStore.add(subscriber);
     }
 
     public void play(final String trackUri) {

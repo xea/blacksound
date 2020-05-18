@@ -68,13 +68,18 @@ public class Server {
         router.route("/").handler(StaticHandler.create());
         router.route("/favicon.ico").handler(FaviconHandler.create());
         router.route("/static/*").handler(StaticHandler.create());
-        // This is where Spotify will call back once the authentication is done
+        // This is where Spotify will call back once the authentication is done, registers new users without a session
         router.route("/spotify-redirect").handler(new CallbackHandler(core, vertx));
+        // Handle user subscribe/unsubscribe requests coming from pre-registered users with live sessions
+        router.route("/api/subscribe").handler(new SubscribeHandler(core, vertx));
+        router.route("/api/unsubscribe").handler(new UnsubscribeHandler(core, vertx));
+
         router.route("/api/next-song").handler(new NextSongHandler());
         router.route("/api/play").handler(BodyHandler.create()).handler(new PlayHandler(core));
         // This exposes our redirect URI to the frontend
         router.route("/api/redirect-uri").handler(new RedirectURIHandler(core));
         router.route("/api/status").handler(new StatusHandler());
+
 
         // TODO we'll need to hide this call behind an authorization check once we've got users
         router.route("/api/shutdown").handler(new ShutDownHandler(this));
