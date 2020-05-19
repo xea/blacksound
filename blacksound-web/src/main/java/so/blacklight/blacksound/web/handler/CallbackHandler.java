@@ -5,7 +5,8 @@ import io.vertx.ext.web.RoutingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.StreamingCore;
-import so.blacklight.blacksound.Subscriber;
+import so.blacklight.blacksound.subscriber.Subscriber;
+import so.blacklight.blacksound.subscriber.SubscriberId;
 
 public class CallbackHandler implements VertxHandler {
 
@@ -27,11 +28,10 @@ public class CallbackHandler implements VertxHandler {
         final var code = request.getParam("code");
 
         core.requestAuthorisation(code).thenAcceptAsync(credentials -> {
-            final var subscriber = new Subscriber(credentials);
+            final var id = new SubscriberId(routingContext.session().id());
+            final var subscriber = new Subscriber(id, credentials);
 
-            final var id = core.register(subscriber);
-
-            routingContext.session().put("subscription-id", id.value().toString());
+            core.register(subscriber);
 
             log.info("Registered new subscriber with ID {}", id);
 

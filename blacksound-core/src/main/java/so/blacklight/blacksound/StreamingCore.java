@@ -6,22 +6,22 @@ import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredential
 import org.apache.hc.core5.http.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import so.blacklight.blacksound.session.SessionId;
-import so.blacklight.blacksound.session.SessionStore;
-import so.blacklight.blacksound.session.impl.FileSessionStore;
 import so.blacklight.blacksound.spotify.SpotifyConfig;
+import so.blacklight.blacksound.subscriber.FileSubscriberStore;
+import so.blacklight.blacksound.subscriber.Subscriber;
+import so.blacklight.blacksound.subscriber.SubscriberId;
+import so.blacklight.blacksound.subscriber.SubscriberStore;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class StreamingCore {
 
     private final SpotifyApi spotifyApi;
 
-    private final SessionStore<Subscriber> sessionStore = new FileSessionStore();
     private final Logger log = LogManager.getLogger(getClass());
+    private final SubscriberStore subscribers = new FileSubscriberStore();
 
     public StreamingCore(final SpotifyConfig config) {
         spotifyApi = config.setupSecrets(new SpotifyApi.Builder())
@@ -55,12 +55,12 @@ public class StreamingCore {
         return authCodeRequest.executeAsync();
     }
 
-    public SessionId register(final Subscriber subscriber) {
-        return sessionStore.add(subscriber);
+    public void register(final Subscriber subscriber) {
+        subscribers.register(subscriber);
     }
 
     public void play(final String trackUri) {
-        sessionStore.forEach(subscriber -> {
+        subscribers.forEach(subscriber -> {
             final var playRequest = subscriber.getApi()
                     .startResumeUsersPlayback()
                     .context_uri(trackUri)

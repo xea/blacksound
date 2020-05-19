@@ -4,13 +4,14 @@ import io.vavr.control.Try;
 import io.vavr.control.Validation;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
-import io.vertx.core.http.CookieSameSite;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.handler.*;
-import io.vertx.ext.web.sstore.LocalSessionStore;
+import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.FaviconHandler;
+import io.vertx.ext.web.handler.LoggerHandler;
+import io.vertx.ext.web.handler.StaticHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.StreamingCore;
@@ -55,14 +56,16 @@ public class Server {
     private Router setupRoutes() {
         final var router = Router.router(vertx);
 
+        /*
         final var sessionHandler = SessionHandler.create(LocalSessionStore.create(vertx))
                 .setCookieHttpOnlyFlag(true)
                 .setCookieSecureFlag(false) // TODO allow this once the keystores have been configured
                 .setCookieSameSite(CookieSameSite.STRICT);
+         */
 
         router.route()
                 .handler(LoggerHandler.create())
-                .handler(sessionHandler)
+        //        .handler(sessionHandler)
                 .handler(RoutingContext::next);
 
         router.route("/").handler(StaticHandler.create());

@@ -6,7 +6,6 @@ import io.vertx.ext.web.RoutingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.StreamingCore;
-import so.blacklight.blacksound.Subscriber;
 
 public class SubscribeHandler implements Handler<RoutingContext> {
 

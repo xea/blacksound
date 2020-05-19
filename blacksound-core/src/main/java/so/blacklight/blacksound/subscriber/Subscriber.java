@@ -1,21 +1,21 @@
-package so.blacklight.blacksound;
+package so.blacklight.blacksound.subscriber;
 
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredentials;
-import so.blacklight.blacksound.session.Session;
-import so.blacklight.blacksound.session.SessionId;
+import so.blacklight.blacksound.id.Identifiable;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
-public class Subscriber implements Session {
+public class Subscriber implements Identifiable<SubscriberId> {
 
-    private final SessionId id;
+    private final SubscriberId id;
     private final SpotifyApi api;
-    private Instant expires;
+    Instant expires;
 
-    public Subscriber(final String accessToken, final String refreshToken, final Instant expires) {
-        this.id = new SessionId();
+    public Subscriber(final SubscriberId id, final String accessToken, final String refreshToken, final Instant expires) {
+        this.id = Optional.ofNullable(id).orElse(new SubscriberId());
         this.expires = expires;
 
         api = new SpotifyApi.Builder()
@@ -25,14 +25,19 @@ public class Subscriber implements Session {
     }
 
     public Subscriber(AuthorizationCodeCredentials credentials) {
+        this(new SubscriberId(), credentials);
+    }
+
+    public Subscriber(final SubscriberId id, final AuthorizationCodeCredentials credentials) {
         this(
+                id,
                 credentials.getAccessToken(),
                 credentials.getRefreshToken(),
                 Instant.now().plus(credentials.getExpiresIn(), ChronoUnit.SECONDS));
     }
 
     @Override
-    public SessionId getId() {
+    public SubscriberId getId() {
         return id;
     }
 
@@ -53,4 +58,5 @@ public class Subscriber implements Session {
     public boolean needRefresh() {
         return Instant.now().isAfter(expires);
     }
+
 }

@@ -1,21 +1,25 @@
-package so.blacklight.blacksound.session;
+package so.blacklight.blacksound.subscriber;
 
-import so.blacklight.blacksound.Id;
+import so.blacklight.blacksound.id.Id;
 
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-public class SessionId implements Id<Session, UUID> {
+public class SubscriberId implements Id<Subscriber, UUID> {
 
     private final UUID id;
 
-    public SessionId() {
+    public SubscriberId() {
         this.id = UUID.randomUUID();
     }
 
-    public SessionId(final UUID sessionId) {
-        this.id = Optional.ofNullable(sessionId).orElse(UUID.randomUUID());
+    public SubscriberId(final UUID subscriberId) {
+        this(subscriberId.toString());
+    }
+
+    public SubscriberId(final String subscriberId) {
+        this.id = Optional.ofNullable(UUID.fromString(subscriberId)).orElse(UUID.randomUUID());
     }
 
     @Override
@@ -27,17 +31,15 @@ public class SessionId implements Id<Session, UUID> {
 
     @Override
     public String toString() {
-        return "SessionId{" +
-                "id=" + id.toString() +
-                '}';
+        return "SessionId{id=" + id + '}';
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SessionId sessionId = (SessionId) o;
-        return Objects.equals(id, sessionId.id);
+        SubscriberId subscriberId = (SubscriberId) o;
+        return Objects.equals(id, subscriberId.id);
     }
 
     @Override

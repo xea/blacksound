@@ -1,4 +1,4 @@
-package so.blacklight.blacksound;
+package so.blacklight.blacksound.id;
 
 /**
  * A tag value that is used to uniquely identify an object of a given type.

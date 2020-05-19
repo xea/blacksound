@@ -6,21 +6,17 @@ import java.net.URI;
 
 public class SpotifyConfig {
 
-    private String clientId;
+    private final String clientId;
 
-    private String clientSecret;
+    private final String clientSecret;
 
-    private URI redirectUri;
+    private final URI redirectUri;
 
     // The package-private constructor is reserved for serialisation/de-serialisation and should not be used normally
     SpotifyConfig() {
         clientId = "";
         clientSecret = "";
         redirectUri = URI.create("http://localhost");
-    }
-
-    public SpotifyConfig(final String clientId, final String clientSecret, final String redirectUri) {
-        this(clientId, clientSecret, URI.create(redirectUri));
     }
 
     public SpotifyConfig(final String clientId, final String clientSecret, final URI redirectUri) {
