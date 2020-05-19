@@ -28,8 +28,12 @@ public class CallbackHandler implements VertxHandler {
         final var code = request.getParam("code");
 
         core.requestAuthorisation(code).thenAcceptAsync(credentials -> {
-            final var id = new SubscriberId(routingContext.session().id());
+            final var id = new SubscriberId();
             final var subscriber = new Subscriber(id, credentials);
+
+            // Using the session store to persist the subscriber id on the server side will suffice for now, but later
+            // we might want to push it to the client side
+            routingContext.session().put("subscriber-id", id.value().toString());
 
             core.register(subscriber);
 

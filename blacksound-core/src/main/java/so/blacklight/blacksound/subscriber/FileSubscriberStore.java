@@ -8,10 +8,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.*;
 import java.net.URI;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -62,7 +59,11 @@ public class FileSubscriberStore implements SubscriberStore {
                 }
             }
 
-            final var subscribers = entries.stream().map(FileEntry::toSubscriber).collect(Collectors.toList());
+            final var subscribers = Optional.ofNullable(entries)
+                    .orElse(Collections.emptyList())
+                    .stream()
+                    .map(FileEntry::toSubscriber)
+                    .collect(Collectors.toList());
 
             synchronized (cache) {
                 cache.clear();
@@ -77,7 +78,6 @@ public class FileSubscriberStore implements SubscriberStore {
 
     private void persistToFile() {
         try {
-
             final List<FileEntry> entries;
 
             synchronized (cache) {

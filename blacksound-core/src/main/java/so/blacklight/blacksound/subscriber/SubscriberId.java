@@ -15,11 +15,11 @@ public class SubscriberId implements Id<Subscriber, UUID> {
     }
 
     public SubscriberId(final UUID subscriberId) {
-        this(subscriberId.toString());
+        this.id = Optional.of(subscriberId).orElse(UUID.randomUUID());
     }
 
     public SubscriberId(final String subscriberId) {
-        this.id = Optional.ofNullable(UUID.fromString(subscriberId)).orElse(UUID.randomUUID());
+        this(UUID.fromString(subscriberId));
     }
 
     @Override
