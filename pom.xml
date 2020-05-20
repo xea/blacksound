@@ -8,7 +8,6 @@
     <artifactId>blacksound</artifactId>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>blacksound-sandbox</module>
         <module>blacksound-core</module>
         <module>blacksound-web</module>
     </modules>
