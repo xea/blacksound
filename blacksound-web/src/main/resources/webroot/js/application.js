@@ -5,6 +5,12 @@ let _ = new Vue({
         redirectUri: undefined,
         trackUri: undefined,
     },
+    mounted: function() {
+        fetch("/api/status")
+            .then(function (response) {
+                this.statusMessage = "Status OK";
+            });
+    },
     methods: {
         loadSettings: function() {
             fetch("/api/redirect-uri")
@@ -29,12 +35,6 @@ let _ = new Vue({
                 console.log(response);
             })
         },
-        status: function() {
-            fetch("/api/status")
-                .then(function(response) {
-                    console.log(response);
-                })
-        }
     }
 
 });

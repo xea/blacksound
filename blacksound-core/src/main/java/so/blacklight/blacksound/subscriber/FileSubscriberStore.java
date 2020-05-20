@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class FileSubscriberStore implements SubscriberStore {
@@ -35,10 +36,11 @@ public class FileSubscriberStore implements SubscriberStore {
         cache = new CopyOnWriteArrayList<>();
 
         this.storeFile = storeFile;
-        restoreFromFile();
+        restore();
     }
 
-    private void restoreFromFile() {
+    @Override
+    public void restore() {
         try {
             final List<FileEntry> entries;
 
@@ -69,6 +71,8 @@ public class FileSubscriberStore implements SubscriberStore {
                 cache.clear();
                 cache.addAll(subscribers);
             }
+
+            log.info("Loaded {} subscribers from file store", subscribers.size());
         } catch (final FileNotFoundException e) {
             log.error("Could not load subscriber store from file {}", storeFile.getAbsolutePath(), e);
         } catch (IOException e) {
@@ -76,7 +80,8 @@ public class FileSubscriberStore implements SubscriberStore {
         }
     }
 
-    private void persistToFile() {
+    @Override
+    public void save() {
         try {
             final List<FileEntry> entries;
 
@@ -107,12 +112,13 @@ public class FileSubscriberStore implements SubscriberStore {
     public void register(final Subscriber subscriber) {
         cache.add(subscriber);
 
-        persistToFile();
+        save();
     }
 
+
     @Override
-    public void forEach(final Consumer<Subscriber> subscriberConsumer) {
-        cache.forEach(subscriberConsumer);
+    public int forEach(Function<Subscriber, Boolean> subscriberConsumer) {
+        return (int) cache.stream().map(subscriberConsumer).filter(p -> p).count();
     }
 
     private static class FileEntry {

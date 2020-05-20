@@ -9,12 +9,14 @@ import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.spotify.SpotifyConfig;
 import so.blacklight.blacksound.subscriber.FileSubscriberStore;
 import so.blacklight.blacksound.subscriber.Subscriber;
-import so.blacklight.blacksound.subscriber.SubscriberId;
 import so.blacklight.blacksound.subscriber.SubscriberStore;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class StreamingCore {
 
@@ -22,12 +24,14 @@ public class StreamingCore {
 
     private final Logger log = LogManager.getLogger(getClass());
     private final SubscriberStore subscribers = new FileSubscriberStore();
+    private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(4);
 
     public StreamingCore(final SpotifyConfig config) {
         spotifyApi = config.setupSecrets(new SpotifyApi.Builder())
                 .setRedirectUri(config.getRedirectUri())
                 .build();
 
+        scheduler.scheduleAtFixedRate(this::refreshSubscribers, 1, 30, TimeUnit.MINUTES);
     }
 
     public URI requestAuthorisationURI() {
@@ -70,9 +74,24 @@ public class StreamingCore {
                 final String result = playRequest.execute();
 
                 System.out.println("Result: " + result);
+
+                return true;
             } catch (ParseException | IOException | SpotifyWebApiException e) {
                 log.error("Error while playing song", e);
             }
+
+            return false;
         });
+    }
+
+    private void refreshSubscribers() {
+        log.debug("Refreshing access tokens");
+
+        final var refreshed = subscribers.forEach(Subscriber::refreshToken);
+        subscribers.save();
+
+        if (refreshed > 0) {
+            log.info("Refreshed {} access tokens", refreshed);
+        }
     }
 }

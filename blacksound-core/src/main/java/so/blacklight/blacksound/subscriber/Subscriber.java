@@ -45,14 +45,24 @@ public class Subscriber implements Identifiable<SubscriberId> {
         return api;
     }
 
-    public void refreshToken() {
-        final var refreshRequest = api.authorizationCodeRefresh().build();
+    public boolean refreshToken() {
+        final boolean refreshed;
 
-        refreshRequest.executeAsync().thenAcceptAsync(credentials -> {
-            api.setAccessToken(credentials.getAccessToken());
-            api.setRefreshToken(credentials.getRefreshToken());
-            expires = Instant.now().plus(credentials.getExpiresIn(), ChronoUnit.SECONDS);
-        });
+        if (needRefresh()) {
+            final var refreshRequest = api.authorizationCodeRefresh().build();
+
+            refreshRequest.executeAsync().thenAcceptAsync(credentials -> {
+                api.setAccessToken(credentials.getAccessToken());
+                api.setRefreshToken(credentials.getRefreshToken());
+                expires = Instant.now().plus(credentials.getExpiresIn(), ChronoUnit.SECONDS);
+            });
+
+            refreshed = true;
+        } else {
+            refreshed = false;
+        }
+
+        return refreshed;
     }
 
     public boolean needRefresh() {
