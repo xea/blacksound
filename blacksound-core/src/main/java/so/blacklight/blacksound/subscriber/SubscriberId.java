@@ -31,7 +31,7 @@ public class SubscriberId implements Id<Subscriber, UUID> {
 
     @Override
     public String toString() {
-        return "SessionId{id=" + id + '}';
+        return id.toString();
     }
 
     @Override

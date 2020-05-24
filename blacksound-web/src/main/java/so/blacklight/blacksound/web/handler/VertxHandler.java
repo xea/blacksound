@@ -6,6 +6,8 @@ import io.vertx.ext.web.RoutingContext;
 
 public interface VertxHandler extends Handler<RoutingContext> {
 
+    String SESSION_KEY = "subscriber-id";
+
     default <T> String asJson(final T object) {
         return new Gson().toJson(object);
     }

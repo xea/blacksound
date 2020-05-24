@@ -15,7 +15,7 @@ public class RedirectURIHandler implements VertxHandler {
     public void handle(RoutingContext routingContext) {
         final var response = routingContext.response();
 
-        final var uri = core.requestAuthorisationURI();
+        final var uri = core.getAuthorizationURI();
 
         response.putHeader("Content-type", "application/json");
 

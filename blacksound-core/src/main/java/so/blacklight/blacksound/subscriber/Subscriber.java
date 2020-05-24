@@ -1,12 +1,13 @@
 package so.blacklight.blacksound.subscriber;
 
 import com.wrapper.spotify.SpotifyApi;
-import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredentials;
+import io.vavr.control.Try;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.id.Identifiable;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 
 public class Subscriber implements Identifiable<SubscriberId> {
 
@@ -14,26 +15,12 @@ public class Subscriber implements Identifiable<SubscriberId> {
     private final SpotifyApi api;
     Instant expires;
 
-    public Subscriber(final SubscriberId id, final String accessToken, final String refreshToken, final Instant expires) {
-        this.id = Optional.ofNullable(id).orElse(new SubscriberId());
+    private final Logger log = LogManager.getLogger(getClass());
+
+    public Subscriber(final SubscriberId id, final SpotifyApi api, final Instant expires) {
+        this.id = id;
+        this.api = api;
         this.expires = expires;
-
-        api = new SpotifyApi.Builder()
-                .setAccessToken(accessToken)
-                .setRefreshToken(refreshToken)
-                .build();
-    }
-
-    public Subscriber(AuthorizationCodeCredentials credentials) {
-        this(new SubscriberId(), credentials);
-    }
-
-    public Subscriber(final SubscriberId id, final AuthorizationCodeCredentials credentials) {
-        this(
-                id,
-                credentials.getAccessToken(),
-                credentials.getRefreshToken(),
-                Instant.now().plus(credentials.getExpiresIn(), ChronoUnit.SECONDS));
     }
 
     @Override
@@ -51,14 +38,23 @@ public class Subscriber implements Identifiable<SubscriberId> {
         if (needRefresh()) {
             final var refreshRequest = api.authorizationCodeRefresh().build();
 
-            refreshRequest.executeAsync().thenAcceptAsync(credentials -> {
+            Try.of(refreshRequest::execute).toValidation(throwable -> {
+                log.error("Failed to refresh token for user {} because of API error", id.toString(), throwable);
+
+                return false;
+            }).map(credentials -> {
                 api.setAccessToken(credentials.getAccessToken());
                 api.setRefreshToken(credentials.getRefreshToken());
                 expires = Instant.now().plus(credentials.getExpiresIn(), ChronoUnit.SECONDS);
+                log.info("Refreshing token for user {} was successful", id.toString());
+
+                return true;
             });
 
             refreshed = true;
         } else {
+            log.info("Skipping refresh for subscriber {}", id.toString());
+
             refreshed = false;
         }
 
@@ -69,4 +65,7 @@ public class Subscriber implements Identifiable<SubscriberId> {
         return Instant.now().isAfter(expires);
     }
 
+    public SubscriberHandle createHandle() {
+        return new SubscriberHandle(id.toString(), api.getAccessToken(), api.getRefreshToken(), expires.toEpochMilli());
+    }
 }

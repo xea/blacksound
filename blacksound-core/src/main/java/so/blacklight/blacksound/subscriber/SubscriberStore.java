@@ -1,14 +1,14 @@
 package so.blacklight.blacksound.subscriber;
 
+import java.util.Collection;
+import java.util.Set;
 import java.util.function.Function;
 
 public interface SubscriberStore {
 
-    void register(Subscriber subscriber);
+    Set<SubscriberHandle> loadEntries();
 
-    int forEach(Function<Subscriber, Boolean> subscriberConsumer);
+    <T> Set<T> loadEntries(Function<SubscriberHandle, T> handleMapper);
 
-    void save();
-
-    void restore();
+    void saveEntries(Collection<SubscriberHandle> subscribers);
 }

@@ -9,21 +9,24 @@ import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.spotify.SpotifyConfig;
 import so.blacklight.blacksound.subscriber.FileSubscriberStore;
 import so.blacklight.blacksound.subscriber.Subscriber;
+import so.blacklight.blacksound.subscriber.SubscriberId;
 import so.blacklight.blacksound.subscriber.SubscriberStore;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 public class StreamingCore {
 
     private final SpotifyApi spotifyApi;
+    private final SubscriberStore subscriberStore;
+    private final List<Subscriber> subscribers;
 
     private final Logger log = LogManager.getLogger(getClass());
-    private final SubscriberStore subscribers = new FileSubscriberStore();
     private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(4);
 
     public StreamingCore(final SpotifyConfig config) {
@@ -31,10 +34,27 @@ public class StreamingCore {
                 .setRedirectUri(config.getRedirectUri())
                 .build();
 
-        scheduler.scheduleAtFixedRate(this::refreshSubscribers, 1, 30, TimeUnit.MINUTES);
+        subscribers = new CopyOnWriteArrayList<>();
+        subscriberStore = new FileSubscriberStore();
+
+        subscribers.addAll(subscriberStore.loadEntries(subscriberHandle -> {
+            final var subscriberId = new SubscriberId(subscriberHandle.getId());
+            final var subscriberApi = new SpotifyApi.Builder()
+                    .setClientId(spotifyApi.getClientId())
+                    .setClientSecret(spotifyApi.getClientSecret())
+                    .setAccessToken(subscriberHandle.getAccessToken())
+                    .setRefreshToken(subscriberHandle.getRefreshToken())
+                    .build();
+
+            final var subscriberExpires = Instant.ofEpochMilli(subscriberHandle.getExpires());
+
+            return new Subscriber(subscriberId, subscriberApi, subscriberExpires);
+        }));
+
+        scheduler.scheduleAtFixedRate(this::refreshSubscribers, 0, 30, TimeUnit.MINUTES);
     }
 
-    public URI requestAuthorisationURI() {
+    public URI getAuthorizationURI() {
         // Not sure if this needs to be more dynamic
         final var scopeItems = new String[] {
                 "user-read-playback-state",
@@ -59,8 +79,32 @@ public class StreamingCore {
         return authCodeRequest.executeAsync();
     }
 
-    public void register(final Subscriber subscriber) {
-        subscribers.register(subscriber);
+    public SubscriberId register(final AuthorizationCodeCredentials credentials) {
+        final var id = new SubscriberId();
+        final var api = new SpotifyApi.Builder()
+                .setClientId(spotifyApi.getClientId())
+                .setClientSecret(spotifyApi.getClientSecret())
+                .setAccessToken(credentials.getAccessToken())
+                .setRefreshToken(credentials.getRefreshToken())
+                .build();
+
+        final var expires = Instant.now().plus(credentials.getExpiresIn(), ChronoUnit.SECONDS);
+
+        subscribers.add(new Subscriber(id, api, expires));
+
+        updateSubscribers();
+
+        return id;
+    }
+
+    private void updateSubscribers() {
+        final var handles = subscribers.stream()
+                .map(Subscriber::createHandle)
+                .collect(Collectors.toSet());
+
+        synchronized (subscriberStore) {
+            subscriberStore.saveEntries(handles);
+        }
     }
 
     public void play(final String trackUri) {
@@ -74,24 +118,22 @@ public class StreamingCore {
                 final String result = playRequest.execute();
 
                 System.out.println("Result: " + result);
-
-                return true;
             } catch (ParseException | IOException | SpotifyWebApiException e) {
                 log.error("Error while playing song", e);
             }
-
-            return false;
         });
     }
 
     private void refreshSubscribers() {
         log.debug("Refreshing access tokens");
 
-        final var refreshed = subscribers.forEach(Subscriber::refreshToken);
-        subscribers.save();
+        final var refreshed = subscribers.stream()
+                .map(Subscriber::refreshToken)
+                .filter(e -> e)
+                .count();
 
-        if (refreshed > 0) {
-            log.info("Refreshed {} access tokens", refreshed);
-        }
+        updateSubscribers();
+
+        log.info("Refreshed {} access tokens", refreshed);
     }
 }
