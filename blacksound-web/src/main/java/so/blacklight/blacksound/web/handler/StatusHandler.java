@@ -1,26 +1,31 @@
 package so.blacklight.blacksound.web.handler;
 
+import io.vavr.control.Option;
+import io.vertx.core.http.Cookie;
 import io.vertx.ext.web.RoutingContext;
 import so.blacklight.blacksound.StreamingCore;
+import so.blacklight.blacksound.crypto.Crypto;
 import so.blacklight.blacksound.subscriber.Subscriber;
 import so.blacklight.blacksound.subscriber.SubscriberId;
-
-import java.util.Optional;
 
 public class StatusHandler implements VertxHandler {
 
     private final StreamingCore core;
+    private final Crypto crypto;
 
-    public StatusHandler(final StreamingCore core) {
+    public StatusHandler(final StreamingCore core, final Crypto crypto) {
         this.core = core;
+        this.crypto = crypto;
     }
 
     @Override
     public void handle(RoutingContext routingContext) {
-        final String maybeSubscriberId = routingContext.session().get(SESSION_KEY);
-
-        final var response = Optional.ofNullable(maybeSubscriberId)
+        final var response = Option.of(routingContext.getCookie(SESSION_KEY))
+                .map(Cookie::getValue)
+                .flatMap(encryptedId -> crypto.decode64AndDecrypt(encryptedId).toOption())
+                .map(String::new)
                 .map(SubscriberId::new)
+                .toJavaOptional()
                 .flatMap(core::findSubscriber)
                 .map(this::authenticatedResponse)
                 .orElseGet(this::unauthenticatedResponse);
@@ -29,7 +34,8 @@ public class StatusHandler implements VertxHandler {
     }
 
     private StatusResponse authenticatedResponse(final Subscriber subscriber) {
-        return new AuthenticatedStatusResponse(subscriber.getId().toString(), subscriber.isEnabled());
+        final var currentTrack = subscriber.getCurrentTrack();
+        return new AuthenticatedStatusResponse(subscriber.getId().toString(), subscriber.isEnabled(), currentTrack);
     }
 
     private StatusResponse unauthenticatedResponse() {
@@ -65,12 +71,14 @@ public class StatusHandler implements VertxHandler {
 
         public final String name;
         public final boolean streamingEnabled;
+        public final String currentTrack;
 
-        public AuthenticatedStatusResponse(final String name, final boolean streamingEnabled) {
+        public AuthenticatedStatusResponse(final String name, final boolean streamingEnabled, final String currentTrack) {
             super(true);
 
             this.name = name;
             this.streamingEnabled = streamingEnabled;
+            this.currentTrack = currentTrack;
         }
 
     }

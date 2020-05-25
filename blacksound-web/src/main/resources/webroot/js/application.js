@@ -4,6 +4,7 @@ let _ = new Vue({
         statusMessage: "Uninitialized",
         spotify: {
             authorizationCode: undefined,
+            currentTrack: undefined,
             redirectUri: undefined,
             trackId: undefined
         },
@@ -25,6 +26,7 @@ let _ = new Vue({
 
                     if (response.hasSession) {
                         vm.user.name = response.name;
+                        vm.spotify.currentTrack = response.currentTrack;
                     } else {
                         vm.spotify.redirectUri = response.redirectUri;
                     }

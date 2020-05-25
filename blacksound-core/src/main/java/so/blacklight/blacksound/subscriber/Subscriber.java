@@ -1,6 +1,8 @@
 package so.blacklight.blacksound.subscriber;
 
 import com.wrapper.spotify.SpotifyApi;
+import com.wrapper.spotify.model_objects.miscellaneous.CurrentlyPlaying;
+import com.wrapper.spotify.model_objects.specification.Track;
 import io.vavr.control.Try;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -88,5 +90,21 @@ public class Subscriber implements Identifiable<SubscriberId> {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public String getCurrentTrack() {
+        return Try.of(() -> api.getUsersCurrentlyPlayingTrack().build().execute())
+                .map(currentlyPlaying -> {
+                    final var item = currentlyPlaying.getItem();
+
+                    if (item instanceof Track) {
+                        final var track = (Track) item;
+
+                        return track.getName() + " " + track.getUri();
+                    }
+
+                    return "Meh";
+                })
+                .getOrElse("None");
     }
 }

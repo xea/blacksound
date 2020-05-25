@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.StreamingCore;
 import so.blacklight.blacksound.config.ConfigLoader;
 import so.blacklight.blacksound.config.ServerConfig;
+import so.blacklight.blacksound.crypto.AeadCrypto;
 import so.blacklight.blacksound.web.handler.*;
 
 import java.io.File;
@@ -55,6 +56,8 @@ public class Server {
     private Router setupRoutes() {
         final var router = Router.router(vertx);
 
+        final var crypto = AeadCrypto.getInstance();
+
         final var sessionHandler = SessionHandler.create(LocalSessionStore.create(vertx))
                 .setCookieHttpOnlyFlag(true)
                 .setCookieSecureFlag(false) // TODO allow this once the key stores have been configured
@@ -69,7 +72,7 @@ public class Server {
         router.route("/favicon.ico").handler(FaviconHandler.create());
         router.route("/static/*").handler(StaticHandler.create());
         // This is where Spotify will call back once the authentication is done, registers new users without a session
-        router.route("/spotify-redirect").handler(new CallbackHandler(core, vertx));
+        router.route("/spotify-redirect").handler(new CallbackHandler(core, vertx, crypto));
         // Handle user subscribe/unsubscribe requests coming from pre-registered users with live sessions
         router.route("/api/subscribe").handler(new SubscribeHandler(core, vertx));
         router.route("/api/unsubscribe").handler(new UnsubscribeHandler(core, vertx));
@@ -78,7 +81,7 @@ public class Server {
         router.route("/api/play").handler(BodyHandler.create()).handler(new PlayHandler(core));
         // This exposes our redirect URI to the frontend
         router.route("/api/redirect-uri").handler(new RedirectURIHandler(core));
-        router.route("/api/status").handler(new StatusHandler(core));
+        router.route("/api/status").handler(new StatusHandler(core, crypto));
 
 
         // TODO we'll need to hide this call behind an authorization check once we've got users

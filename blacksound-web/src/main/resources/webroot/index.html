@@ -18,6 +18,10 @@
             You are logged in as {{ user.name }}
 
             <div>
+                You're currently playing: {{ spotify.currentTrack }}
+            </div>
+
+            <div>
                 Now try playing this track:
                 <input id="trackId" v-model="spotify.trackId" width="40" />
                 <button id="playTrackNow" v-on:click="playTrack">Play track</button>
