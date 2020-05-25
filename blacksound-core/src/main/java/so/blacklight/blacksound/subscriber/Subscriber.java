@@ -86,4 +86,7 @@ public class Subscriber implements Identifiable<SubscriberId> {
         return this;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
 }

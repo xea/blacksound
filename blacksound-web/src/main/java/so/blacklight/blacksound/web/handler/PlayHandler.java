@@ -23,12 +23,21 @@ public class PlayHandler implements VertxHandler {
 
         core.play(playRequest.trackUri);
 
-        response.end("{ status: \"ok\" }");
+        response.end(asJson(new PlayResponse("ok")));
     }
 
     private static class PlayRequest {
 
         private String trackUri;
 
+    }
+
+    private static class PlayResponse {
+
+        public final String status;
+
+        public PlayResponse(final String status) {
+            this.status = status;
+        }
     }
 }

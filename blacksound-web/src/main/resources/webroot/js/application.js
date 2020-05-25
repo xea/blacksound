@@ -4,7 +4,8 @@ let _ = new Vue({
         statusMessage: "Uninitialized",
         spotify: {
             authorizationCode: undefined,
-            redirectUri: undefined
+            redirectUri: undefined,
+            trackId: undefined
         },
         user: {
             hasSession: false,
@@ -29,6 +30,18 @@ let _ = new Vue({
                     }
                 });
         },
+        playTrack: function() {
+            let vm = this;
+            vm.statusMessage = "Playing track";
+
+            let request = { trackId: vm.spotify.trackId };
+
+            fetch("/api/play", { method: "POST", body: JSON.stringify(request) })
+                .then(response => response.json())
+                .then(response => {
+                    vm.statusMessage = "Playing your stupid track";
+                })
+        },
         sendAuthorizationCode: function() {
             let vm = this;
             vm.statusMessage = "Sending authorization code";
@@ -46,25 +59,7 @@ let _ = new Vue({
         })
     }
     /*
-    data: {
-        statusMessage: "Init",
-        redirectUri: undefined,
-        trackUri: undefined,
-    },
-    mounted: function() {
-        this.$nextTick(function() {
-            fetch("/api/status")
-                .then(function (response) {
-                    this.statusMessage = "Status OK";
-                });
-        })
-    },
     methods: {
-        loadSettings: function() {
-            fetch("/api/redirect-uri")
-                .then(response => response.json())
-                .then(response => this.redirectUri = response.redirectUri)
-        },
         nextSong: function() {
             fetch("/api/next-song", { method: "POST" })
                 .then(function(response) {

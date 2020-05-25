@@ -2,6 +2,7 @@ package so.blacklight.blacksound.web.handler;
 
 import io.vertx.ext.web.RoutingContext;
 import so.blacklight.blacksound.StreamingCore;
+import so.blacklight.blacksound.subscriber.Subscriber;
 import so.blacklight.blacksound.subscriber.SubscriberId;
 
 import java.util.Optional;
@@ -21,10 +22,18 @@ public class StatusHandler implements VertxHandler {
         final var response = Optional.ofNullable(maybeSubscriberId)
                 .map(SubscriberId::new)
                 .flatMap(core::findSubscriber)
-                .map(subscriber -> (StatusResponse) new AuthenticatedStatusResponse(subscriber.getId().toString()))
-                .orElseGet(() -> new UnauthenticatedStatusResponse(core.getAuthorizationURI().toASCIIString()));
+                .map(this::authenticatedResponse)
+                .orElseGet(this::unauthenticatedResponse);
 
         routingContext.response().end(asJson(response));
+    }
+
+    private StatusResponse authenticatedResponse(final Subscriber subscriber) {
+        return new AuthenticatedStatusResponse(subscriber.getId().toString(), subscriber.isEnabled());
+    }
+
+    private StatusResponse unauthenticatedResponse() {
+        return new UnauthenticatedStatusResponse(core.getAuthorizationURI().toASCIIString());
     }
 
     /**
@@ -55,11 +64,14 @@ public class StatusHandler implements VertxHandler {
     static class AuthenticatedStatusResponse extends StatusResponse {
 
         public final String name;
+        public final boolean streamingEnabled;
 
-        public AuthenticatedStatusResponse(final String name) {
+        public AuthenticatedStatusResponse(final String name, final boolean streamingEnabled) {
             super(true);
 
             this.name = name;
+            this.streamingEnabled = streamingEnabled;
         }
+
     }
 }

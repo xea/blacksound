@@ -16,6 +16,12 @@
 
         <div v-if="user.hasSession">
             You are logged in as {{ user.name }}
+
+            <div>
+                Now try playing this track:
+                <input id="trackId" v-model="spotify.trackId" width="40" />
+                <button id="playTrackNow" v-on:click="playTrack">Play track</button>
+            </div>
         </div>
         <div v-else>
             You are not logged in yet,
@@ -25,29 +31,12 @@
             <div>
                 Alternatively, paste authorization code below and click 'Authorize me':
                 <div>
-                    <input id="authorizationCode" v-model="spotify.authorizationCode" />
+                    <input id="authorizationCode" v-model="spotify.authorizationCode" width="40" />
                     <button id="sendAuthorizationCode" v-on:click="sendAuthorizationCode">Authorize me</button>
                 </div>
             </div>
         </div>
     </div>
-
-    <!--
-    <div id="oldapp">
-        {{ statusMessage }}
-
-        <div id="anonymous" v-on:click="loadSettings">
-            Click here to log in using your Spotify account
-        </div>
-
-        <a v-bind:href="redirectUri">Clicky click</a>
-
-        <input id="trackUri" v-model="trackUri" />
-        <div id="play" class="button" v-on:click="playStream">Play</div>
-        <div id="next-song" class="button" v-on:click="nextSong">Next song</div>
-
-    </div>
-    -->
 
     <script src="/static/js/application.js"></script>
 </body>
