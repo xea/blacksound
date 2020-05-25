@@ -3,6 +3,7 @@ package so.blacklight.blacksound;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredentials;
+import io.vavr.control.Option;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,6 +18,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
@@ -48,10 +50,10 @@ public class StreamingCore {
 
             final var subscriberExpires = Instant.ofEpochMilli(subscriberHandle.getExpires());
 
-            return new Subscriber(subscriberId, subscriberApi, subscriberExpires);
+            return new Subscriber(subscriberId, subscriberApi, subscriberExpires, subscriberHandle.isEnabled());
         }));
 
-        scheduler.scheduleAtFixedRate(this::refreshSubscribers, 0, 30, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(this::refreshSubscribers, 0, 10, TimeUnit.MINUTES);
     }
 
     public URI getAuthorizationURI() {
@@ -90,7 +92,7 @@ public class StreamingCore {
 
         final var expires = Instant.now().plus(credentials.getExpiresIn(), ChronoUnit.SECONDS);
 
-        subscribers.add(new Subscriber(id, api, expires));
+        subscribers.add(new Subscriber(id, api, expires, Subscriber.ENABLED));
 
         updateSubscribers();
 
@@ -135,5 +137,11 @@ public class StreamingCore {
         updateSubscribers();
 
         log.info("Refreshed {} access tokens", refreshed);
+    }
+
+    public Optional<Subscriber> findSubscriber(final SubscriberId subscriberId) {
+        return subscribers.stream()
+                .filter(subscriber -> subscriber.getId().equals(subscriberId))
+                .findAny();
     }
 }

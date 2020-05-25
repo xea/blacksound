@@ -11,16 +11,21 @@ import java.time.temporal.ChronoUnit;
 
 public class Subscriber implements Identifiable<SubscriberId> {
 
+    public static final boolean ENABLED = true;
+    public static final boolean DISABLED = false;
+
     private final SubscriberId id;
     private final SpotifyApi api;
+    private boolean enabled;
     Instant expires;
 
     private final Logger log = LogManager.getLogger(getClass());
 
-    public Subscriber(final SubscriberId id, final SpotifyApi api, final Instant expires) {
+    public Subscriber(final SubscriberId id, final SpotifyApi api, final Instant expires, final boolean enabled) {
         this.id = id;
         this.api = api;
         this.expires = expires;
+        this.enabled = enabled;
     }
 
     @Override
@@ -66,6 +71,19 @@ public class Subscriber implements Identifiable<SubscriberId> {
     }
 
     public SubscriberHandle createHandle() {
-        return new SubscriberHandle(id.toString(), api.getAccessToken(), api.getRefreshToken(), expires.toEpochMilli());
+        return new SubscriberHandle(id.toString(), api.getAccessToken(), api.getRefreshToken(), expires.toEpochMilli(), enabled);
     }
+
+    public Subscriber enable() {
+        this.enabled = ENABLED;
+
+        return this;
+    }
+
+    public Subscriber disable() {
+        this.enabled = DISABLED;
+
+        return this;
+    }
+
 }

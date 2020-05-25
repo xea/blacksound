@@ -78,7 +78,7 @@ public class Server {
         router.route("/api/play").handler(BodyHandler.create()).handler(new PlayHandler(core));
         // This exposes our redirect URI to the frontend
         router.route("/api/redirect-uri").handler(new RedirectURIHandler(core));
-        router.route("/api/status").handler(new StatusHandler());
+        router.route("/api/status").handler(new StatusHandler(core));
 
 
         // TODO we'll need to hide this call behind an authorization check once we've got users

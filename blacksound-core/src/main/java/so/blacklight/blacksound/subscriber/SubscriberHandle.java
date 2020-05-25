@@ -10,11 +10,14 @@ public class SubscriberHandle {
 
     private final long expires;
 
-    SubscriberHandle(final String id, final String accessToken, final String refreshToken, final long expires) {
+    private final boolean enabled;
+
+    SubscriberHandle(final String id, final String accessToken, final String refreshToken, final long expires, final boolean enabled) {
         this.id = id;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.expires = expires;
+        this.enabled = enabled;
     }
 
     public String getId() {
@@ -31,5 +34,9 @@ public class SubscriberHandle {
 
     public long getExpires() {
         return expires;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
     }
 }

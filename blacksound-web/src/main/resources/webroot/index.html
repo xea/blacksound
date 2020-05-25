@@ -12,6 +12,28 @@
     <h1>Blacksound</h1>
 
     <div id="app">
+        <div>Status: {{ statusMessage }}</div>
+
+        <div v-if="user.hasSession">
+            You are logged in as {{ user.name }}
+        </div>
+        <div v-else>
+            You are not logged in yet,
+            <a v-bind:href="spotify.redirectUri">click here</a>
+            to authenticate with Spotify
+
+            <div>
+                Alternatively, paste authorization code below and click 'Authorize me':
+                <div>
+                    <input id="authorizationCode" v-model="spotify.authorizationCode" />
+                    <button id="sendAuthorizationCode" v-on:click="sendAuthorizationCode">Authorize me</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--
+    <div id="oldapp">
         {{ statusMessage }}
 
         <div id="anonymous" v-on:click="loadSettings">
@@ -25,6 +47,7 @@
         <div id="next-song" class="button" v-on:click="nextSong">Next song</div>
 
     </div>
+    -->
 
     <script src="/static/js/application.js"></script>
 </body>
