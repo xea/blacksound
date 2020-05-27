@@ -1,9 +1,8 @@
 package so.blacklight.blacksound.crypto;
 
-import com.google.crypto.tink.Aead;
-import com.google.crypto.tink.CleartextKeysetHandle;
-import com.google.crypto.tink.JsonKeysetReader;
+import com.google.crypto.tink.*;
 import com.google.crypto.tink.aead.AeadConfig;
+import com.google.crypto.tink.aead.AeadKeyTemplates;
 import io.vavr.control.Try;
 import io.vavr.control.Validation;
 
@@ -23,10 +22,19 @@ public class AeadCrypto implements Crypto {
 
         // Attempt to load encryption keys
         return Try.of(() -> CleartextKeysetHandle.read(JsonKeysetReader.withPath("keyset.json")))
+                .orElse(AeadCrypto::generateKeys)
                 .mapTry(keysetHandle -> keysetHandle.getPrimitive(Aead.class))
                 .map(AeadCrypto::new)
                 .get();
 
+    }
+
+    private static Try<KeysetHandle> generateKeys() {
+        return Try.of(() -> KeysetHandle.generateNew(AeadKeyTemplates.AES128_GCM))
+                .mapTry(keysetHandle -> {
+                    CleartextKeysetHandle.write(keysetHandle, JsonKeysetWriter.withPath("keyset.json"));
+                    return keysetHandle;
+                });
     }
 
     @Override
