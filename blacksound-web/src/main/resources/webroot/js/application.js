@@ -6,7 +6,7 @@ let _ = new Vue({
             authorizationCode: undefined,
             currentTrack: undefined,
             redirectUri: undefined,
-            trackId: undefined
+            trackUri: undefined
         },
         user: {
             hasSession: false,
@@ -36,12 +36,22 @@ let _ = new Vue({
             let vm = this;
             vm.statusMessage = "Playing track";
 
-            let request = { trackId: vm.spotify.trackId };
+            let request = { trackUri: vm.spotify.trackId };
 
             fetch("/api/play", { method: "POST", body: JSON.stringify(request) })
                 .then(response => response.json())
                 .then(response => {
                     vm.statusMessage = "Playing your stupid track";
+                })
+        },
+        pause: function() {
+            let vm = this;
+            vm.statusMessage = "Pausing track";
+
+            fetch("/api/pause")
+                .then(response => response.json())
+                .then(response => {
+                    vm.statusMessage = "Playback paused";
                 })
         },
         sendAuthorizationCode: function() {

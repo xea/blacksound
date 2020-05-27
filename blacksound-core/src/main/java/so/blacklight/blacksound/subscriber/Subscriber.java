@@ -10,6 +10,7 @@ import so.blacklight.blacksound.id.Identifiable;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 
 public class Subscriber implements Identifiable<SubscriberId> {
 
@@ -51,7 +52,9 @@ public class Subscriber implements Identifiable<SubscriberId> {
                 return false;
             }).map(credentials -> {
                 api.setAccessToken(credentials.getAccessToken());
-                api.setRefreshToken(credentials.getRefreshToken());
+                if (Objects.nonNull(credentials.getRefreshToken())) {
+                    api.setRefreshToken(credentials.getRefreshToken());
+                }
                 expires = Instant.now().plus(credentials.getExpiresIn(), ChronoUnit.SECONDS);
                 log.info("Refreshing token for user {} was successful", id.toString());
 

@@ -1,5 +1,6 @@
 package so.blacklight.blacksound;
 
+import com.google.gson.JsonParser;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredentials;
@@ -113,7 +114,7 @@ public class StreamingCore {
         subscribers.forEach(subscriber -> {
             final var playRequest = subscriber.getApi()
                     .startResumeUsersPlayback()
-                    .context_uri(trackUri)
+                    .uris(JsonParser.parseString("[ \"" + trackUri + "\" ]").getAsJsonArray())
                     .build();
 
             try {
@@ -122,6 +123,20 @@ public class StreamingCore {
                 System.out.println("Result: " + result);
             } catch (ParseException | IOException | SpotifyWebApiException e) {
                 log.error("Error while playing song", e);
+            }
+        });
+    }
+
+    public void pause() {
+        subscribers.forEach(subscriber -> {
+            final var pauseRequest = subscriber.getApi().pauseUsersPlayback().build();
+
+            try {
+                final var result = pauseRequest.execute();
+
+                log.debug("Pause request result: {}", result);
+            } catch (ParseException | SpotifyWebApiException | IOException e) {
+                log.error("Error during pause", e);
             }
         });
     }
