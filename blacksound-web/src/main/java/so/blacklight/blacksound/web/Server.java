@@ -61,7 +61,7 @@ public class Server {
 
         final var sessionHandler = SessionHandler.create(LocalSessionStore.create(vertx))
                 .setCookieHttpOnlyFlag(true)
-                .setCookieSecureFlag(false) // TODO allow this once the key stores have been configured
+                .setCookieSecureFlag(true)
                 .setCookieSameSite(CookieSameSite.STRICT);
 
         router.route()
