@@ -23,7 +23,8 @@
 
             <div>
                 Now try playing this track:
-                <input id="trackId" v-model="spotify.trackId" width="40" />
+                <input id="trackUri" v-model="spotify.trackUri" width="40" />
+                <button id="queueTrack" v-on:click="queueTrack">Queue track</button>
                 <button id="playTrackNow" v-on:click="playTrack">Play track</button>
                 <button id="pause" v-on:click="pause">Pause</button>
             </div>

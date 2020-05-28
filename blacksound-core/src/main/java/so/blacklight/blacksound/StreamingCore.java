@@ -4,10 +4,13 @@ import com.google.gson.JsonParser;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredentials;
+import com.wrapper.spotify.model_objects.specification.Track;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.spotify.SpotifyConfig;
+import so.blacklight.blacksound.stream.Channel;
+import so.blacklight.blacksound.stream.Song;
 import so.blacklight.blacksound.subscriber.FileSubscriberStore;
 import so.blacklight.blacksound.subscriber.Subscriber;
 import so.blacklight.blacksound.subscriber.SubscriberId;
@@ -27,6 +30,7 @@ public class StreamingCore {
     private final SpotifyApi spotifyApi;
     private final SubscriberStore subscriberStore;
     private final List<Subscriber> subscribers;
+    private final Channel channel;
 
     private final Logger log = LogManager.getLogger(getClass());
     private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(4);
@@ -54,6 +58,8 @@ public class StreamingCore {
         }));
 
         scheduler.scheduleAtFixedRate(this::refreshSubscribers, 0, 10, TimeUnit.MINUTES);
+
+        channel = new Channel(this::playTrack);
     }
 
     public URI getAuthorizationURI() {
@@ -109,21 +115,31 @@ public class StreamingCore {
         }
     }
 
-    public void playTrack(final String trackUri) {
+    public void playTrack(final Song trackUri) {
         subscribers.forEach(subscriber -> {
             final var playRequest = subscriber.getApi()
                     .startResumeUsersPlayback()
-                    .uris(JsonParser.parseString("[ \"" + trackUri + "\" ]").getAsJsonArray())
+                    .uris(JsonParser.parseString("[ \"" + trackUri.getUri() + "\" ]").getAsJsonArray())
                     .build();
 
             try {
-                final String result = playRequest.execute();
-
-                System.out.println("Result: " + result);
+                playRequest.execute();
             } catch (ParseException | IOException | SpotifyWebApiException e) {
                 log.error("Error while playing song", e);
             }
         });
+    }
+
+    public void queue(final String trackUri) {
+        try {
+            final Track track = spotifyApi.getTrack(trackUri).build().execute();
+            final Song song = new Song(track);
+
+            channel.queueTrack(song);
+        } catch (ParseException | SpotifyWebApiException | IOException e) {
+            log.error("Could not queue track", e);
+        }
+
     }
 
     public void play() {

@@ -36,7 +36,7 @@ let _ = new Vue({
             let vm = this;
             vm.statusMessage = "Playing track";
 
-            let request = { trackUri: vm.spotify.trackId };
+            let request = { trackUri: vm.spotify.trackUri };
 
             fetch("/api/play", { method: "POST", body: JSON.stringify(request) })
                 .then(response => response.json())
@@ -52,6 +52,18 @@ let _ = new Vue({
                 .then(response => response.json())
                 .then(response => {
                     vm.statusMessage = "Playback paused";
+                })
+        },
+        queueTrack: function() {
+            let vm = this;
+            vm.statusMessage = "Queueing track";
+
+            let request = { trackUri: vm.spotify.trackUri };
+
+            fetch("/api/queue", { method: "POST", body: JSON.stringify(request) })
+                .then(response => response.json())
+                .then(response => {
+                    vm.statusMessage = "Track queued";
                 })
         },
         sendAuthorizationCode: function() {
