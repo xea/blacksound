@@ -77,6 +77,7 @@ public class CallbackHandler implements VertxHandler {
         final var encryptedId = crypto.encryptAndEncode64(id.toString().getBytes());
 
         final var subscriberCookie = Cookie.cookie(SESSION_KEY, encryptedId);
+        subscriberCookie.setSecure(true);
         subscriberCookie.setHttpOnly(true);
         subscriberCookie.setSameSite(CookieSameSite.STRICT);
 
