@@ -3,6 +3,8 @@ package so.blacklight.blacksound.web.handler;
 import io.vavr.control.Option;
 import io.vertx.core.http.Cookie;
 import io.vertx.ext.web.RoutingContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.StreamingCore;
 import so.blacklight.blacksound.crypto.Crypto;
 import so.blacklight.blacksound.subscriber.Subscriber;
@@ -12,6 +14,7 @@ public class StatusHandler implements VertxHandler {
 
     private final StreamingCore core;
     private final Crypto crypto;
+    private final Logger log = LogManager.getLogger(getClass());
 
     public StatusHandler(final StreamingCore core, final Crypto crypto) {
         this.core = core;
@@ -21,9 +24,11 @@ public class StatusHandler implements VertxHandler {
     @Override
     public void handle(RoutingContext routingContext) {
         final var response = Option.of(routingContext.getCookie(SESSION_KEY))
+                .peek(cookie -> log.debug("Found session cookie"))
                 .map(Cookie::getValue)
                 .flatMap(encryptedId -> crypto.decode64AndDecrypt(encryptedId).toOption())
                 .map(String::new)
+                .peek(sessionId -> log.debug("Session has id {}", sessionId))
                 .map(SubscriberId::new)
                 .toJavaOptional()
                 .flatMap(core::findSubscriber)

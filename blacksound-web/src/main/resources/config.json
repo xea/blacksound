@@ -2,6 +2,7 @@
   "$schema": "config.schema.json",
 
   "network": {
+    "applicationUri": "https://localhost:9861/",
     "listenPort": 9861,
     "workerPoolSize": 16
   },
