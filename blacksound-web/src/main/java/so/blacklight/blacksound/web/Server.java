@@ -15,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.StreamingCore;
 import so.blacklight.blacksound.config.ConfigLoader;
+import so.blacklight.blacksound.config.NetworkConfig;
 import so.blacklight.blacksound.config.ServerConfig;
 import so.blacklight.blacksound.crypto.AeadCrypto;
 import so.blacklight.blacksound.web.handler.*;
@@ -46,14 +47,14 @@ public class Server {
         final var httpServerOptions = new HttpServerOptions()
                 .setPort(networkConfig.getListenPort());
 
-        final var routes = setupRoutes();
+        final var routes = setupRoutes(networkConfig);
 
         httpServer = vertx.createHttpServer(httpServerOptions).requestHandler(routes);
 
         shutDownLatch = new CountDownLatch(1);
     }
 
-    private Router setupRoutes() {
+    private Router setupRoutes(final NetworkConfig networkConfig) {
         final var router = Router.router(vertx);
 
         final var crypto = AeadCrypto.getInstance();
@@ -72,7 +73,7 @@ public class Server {
         router.route("/favicon.ico").handler(FaviconHandler.create());
         router.route("/static/*").handler(StaticHandler.create());
         // This is where Spotify will call back once the authentication is done, registers new users without a session
-        router.route("/spotify-redirect").handler(new CallbackHandler(core, vertx, crypto));
+        router.route("/spotify-redirect").handler(new CallbackHandler(core, vertx, crypto, networkConfig));
         // Handle user subscribe/unsubscribe requests coming from pre-registered users with live sessions
         router.route("/api/subscribe").handler(new SubscribeHandler(core, vertx));
         router.route("/api/unsubscribe").handler(new UnsubscribeHandler(core, vertx));

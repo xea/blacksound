@@ -10,6 +10,10 @@
             "description": "Network-related settings",
             "type": "object",
             "properties": {
+                "applicationUri": {
+                    "description": "Public URI of this application",
+                    "type": "string"
+                },
                 "listenPort": {
                     "description": "TCP port for the server application to listen on",
                     "type": "integer",

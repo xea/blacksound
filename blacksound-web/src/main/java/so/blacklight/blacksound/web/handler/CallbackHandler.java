@@ -1,5 +1,6 @@
 package so.blacklight.blacksound.web.handler;
 
+import io.vavr.control.Try;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.Cookie;
 import io.vertx.core.http.CookieSameSite;
@@ -7,7 +8,11 @@ import io.vertx.ext.web.RoutingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.StreamingCore;
+import so.blacklight.blacksound.config.NetworkConfig;
 import so.blacklight.blacksound.crypto.Crypto;
+
+import java.net.URI;
+import java.util.concurrent.CompletableFuture;
 
 public class CallbackHandler implements VertxHandler {
 
@@ -15,12 +20,15 @@ public class CallbackHandler implements VertxHandler {
     private final StreamingCore core;
     private final Crypto crypto;
 
+    private final URI applicationUri;
+
     private final Logger log = LogManager.getLogger(getClass());
 
-    public CallbackHandler(final StreamingCore core, final Vertx vertx, final Crypto crypto) {
+    public CallbackHandler(final StreamingCore core, final Vertx vertx, final Crypto crypto, final NetworkConfig networkConfig) {
         this.core = core;
         this.vertx = vertx;
         this.crypto = crypto;
+        this.applicationUri = URI.create(networkConfig.getApplicationUri());
     }
 
     @Override
@@ -44,6 +52,8 @@ public class CallbackHandler implements VertxHandler {
 
             log.info("Registered new subscriber with ID {}", id);
 
+            response.setStatusCode(302);
+            response.putHeader("Location", applicationUri.toASCIIString());
             response.end(asJson(new RegistrationResponse("ok")));
         }, vertx.nettyEventLoopGroup());
     }
