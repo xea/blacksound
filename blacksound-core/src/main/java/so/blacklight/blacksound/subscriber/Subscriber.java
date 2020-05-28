@@ -1,7 +1,6 @@
 package so.blacklight.blacksound.subscriber;
 
 import com.wrapper.spotify.SpotifyApi;
-import com.wrapper.spotify.model_objects.miscellaneous.CurrentlyPlaying;
 import com.wrapper.spotify.model_objects.specification.Track;
 import io.vavr.control.Try;
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +11,9 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
+/**
+ * An instance of a subscriber represents a user who had authenticated with spotify
+ */
 public class Subscriber implements Identifiable<SubscriberId> {
 
     public static final boolean ENABLED = true;

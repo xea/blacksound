@@ -8,6 +8,7 @@ package so.blacklight.blacksound.id;
  *           cross-type assignments.
  * @param <T> the value type of the ID, eg. Long, Integer, String, UUID, etc
  */
+@SuppressWarnings("java:S2326") // Type parameter I is actually needed here, although sonar wants to have it removed
 public interface Id<I, T> {
 
     T value();

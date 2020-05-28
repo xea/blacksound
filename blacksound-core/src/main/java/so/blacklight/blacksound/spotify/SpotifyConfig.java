@@ -12,7 +12,7 @@ public class SpotifyConfig {
 
     private final URI redirectUri;
 
-    // The package-private constructor is reserved for serialisation/de-serialisation and should not be used normally
+    // This package-private constructor is reserved for serialisation/de-serialisation purposes and should not be used normally
     SpotifyConfig() {
         clientId = "";
         clientSecret = "";

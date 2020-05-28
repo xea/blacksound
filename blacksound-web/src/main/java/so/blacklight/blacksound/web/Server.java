@@ -79,7 +79,7 @@ public class Server {
         router.route("/api/unsubscribe").handler(new UnsubscribeHandler(core, vertx));
 
         router.route("/api/next-song").handler(new NextSongHandler());
-        router.route("/api/play").handler(BodyHandler.create()).handler(new PlayHandler(core));
+        router.route("/api/play").handler(BodyHandler.create()).handler(new PlayHandler(core, vertx));
         router.route("/api/pause").handler(new PauseResumeHandler(core));
         // This exposes our redirect URI to the frontend
         router.route("/api/redirect-uri").handler(new RedirectURIHandler(core));

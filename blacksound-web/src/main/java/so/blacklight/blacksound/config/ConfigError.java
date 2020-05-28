@@ -1,5 +1,8 @@
 package so.blacklight.blacksound.config;
 
+/**
+ * Error type for configuration-related errors, including parse errors, unreadable files and schema mismatches
+ */
 public class ConfigError {
 
     private final ConfigErrorKind errorKind;

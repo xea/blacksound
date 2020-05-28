@@ -4,7 +4,6 @@ import com.google.gson.JsonParser;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredentials;
-import io.vavr.control.Option;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -110,7 +109,7 @@ public class StreamingCore {
         }
     }
 
-    public void play(final String trackUri) {
+    public void playTrack(final String trackUri) {
         subscribers.forEach(subscriber -> {
             final var playRequest = subscriber.getApi()
                     .startResumeUsersPlayback()
@@ -123,6 +122,19 @@ public class StreamingCore {
                 System.out.println("Result: " + result);
             } catch (ParseException | IOException | SpotifyWebApiException e) {
                 log.error("Error while playing song", e);
+            }
+        });
+    }
+
+    public void play() {
+        subscribers.forEach(subscriber -> {
+            final var playRequest = subscriber.getApi().startResumeUsersPlayback().build();
+
+            try {
+                final var result = playRequest.execute();
+
+            } catch (IOException | SpotifyWebApiException | ParseException e) {
+                log.error("Error while resuming playback", e);
             }
         });
     }
