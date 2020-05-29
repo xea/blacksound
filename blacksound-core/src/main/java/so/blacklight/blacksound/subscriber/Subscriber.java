@@ -21,16 +21,16 @@ public class Subscriber implements Identifiable<SubscriberId> {
 
     private final SubscriberId id;
     private final SpotifyApi api;
-    private boolean enabled;
+    private boolean streamingEnabled;
     Instant expires;
 
     private final Logger log = LogManager.getLogger(getClass());
 
-    public Subscriber(final SubscriberId id, final SpotifyApi api, final Instant expires, final boolean enabled) {
+    public Subscriber(final SubscriberId id, final SpotifyApi api, final Instant expires, final boolean streamingEnabled) {
         this.id = id;
         this.api = api;
         this.expires = expires;
-        this.enabled = enabled;
+        this.streamingEnabled = streamingEnabled;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class Subscriber implements Identifiable<SubscriberId> {
             final var refreshRequest = api.authorizationCodeRefresh().build();
 
             Try.of(refreshRequest::execute).toValidation(throwable -> {
-                log.error("Failed to refresh token for user {} because of API error", id.toString(), throwable);
+                log.error("Failed to refresh token for user {} because of API error", id, throwable);
 
                 return false;
             }).map(credentials -> {
@@ -58,14 +58,14 @@ public class Subscriber implements Identifiable<SubscriberId> {
                     api.setRefreshToken(credentials.getRefreshToken());
                 }
                 expires = Instant.now().plus(credentials.getExpiresIn(), ChronoUnit.SECONDS);
-                log.info("Refreshing token for user {} was successful", id.toString());
+                log.info("Refreshing token for user {} was successful", id);
 
                 return true;
             });
 
             refreshed = true;
         } else {
-            log.info("Skipping refresh for subscriber {}", id.toString());
+            log.info("Skipping refresh for subscriber {}", id);
 
             refreshed = false;
         }
@@ -78,23 +78,11 @@ public class Subscriber implements Identifiable<SubscriberId> {
     }
 
     public SubscriberHandle createHandle() {
-        return new SubscriberHandle(id.toString(), api.getAccessToken(), api.getRefreshToken(), expires.toEpochMilli(), enabled);
+        return new SubscriberHandle(id.toString(), api.getAccessToken(), api.getRefreshToken(), expires.toEpochMilli(), streamingEnabled);
     }
 
-    public Subscriber enable() {
-        this.enabled = ENABLED;
-
-        return this;
-    }
-
-    public Subscriber disable() {
-        this.enabled = DISABLED;
-
-        return this;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
+    public boolean isStreamingEnabled() {
+        return streamingEnabled;
     }
 
     public String getCurrentTrack() {

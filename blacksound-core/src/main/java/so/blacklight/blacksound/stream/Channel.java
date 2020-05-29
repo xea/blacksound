@@ -1,8 +1,9 @@
 package so.blacklight.blacksound.stream;
 
+import io.vavr.control.Option;
+
 import java.time.Instant;
-import java.util.Deque;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -46,5 +47,21 @@ public class Channel {
         if (Objects.nonNull(nextTrack)) {
             playTrack(nextTrack);
         }
+    }
+
+    public Song currentTrack() {
+        return currentTrack;
+    }
+
+    public List<Song> getPlaylist() {
+        final var current = Option.of(currentTrack)
+                .map(Collections::singletonList)
+                .getOrElse(Collections.emptyList());
+
+        final var playlist = new ArrayList<>(current);
+
+        playlist.addAll(queue);
+
+        return playlist;
     }
 }

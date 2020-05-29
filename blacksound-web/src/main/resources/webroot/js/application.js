@@ -14,7 +14,12 @@ let vm = new Vue({
             name: "Some random dude",
             logoutUri: "/api/logout",
             streamingEnabled: undefined
-        }
+        },
+        playlist: [
+            { title: "Metallica / One", uri: "spotify:track:asdfasdf" }
+        ],
+        searchExpression: undefined,
+        searchResult: undefined
     },
     methods: {
         init: function() {
@@ -32,9 +37,51 @@ let vm = new Vue({
                         vm.spotify.currentTrack = response.currentTrack;
                     } else {
                         vm.spotify.redirectUri = response.redirectUri;
+                        vm.user.streamingEnabled = false;
                     }
 
                     vm.debugMessage = "Ready";
+                });
+        },
+        startStreaming: function() {
+            vm.debugMessage = "Starting streaming";
+
+            fetch("/api/resume")
+                .then(response => response.json())
+                .then(function (response) {
+                    vm.debugMessage = "Streaming started";
+                });
+        },
+        pauseStreaming: function() {
+            vm.debugMessage = "Pausing streaming";
+
+            fetch("/api/pause")
+                .then(response => response.json())
+                .then(function (response) {
+                    vm.debugMessage = "Streaming paused";
+                });
+        },
+        queueTrack: function() {
+            vm.debugMessage = "Queueing track";
+
+            fetch("/api/queue")
+                .then(response => response.json())
+                .then(function (response) {
+                    vm.debugMessage = "Track queued";
+                });
+        },
+        searchSong: function() {
+            vm.debugMessage = "Searching for song";
+
+            let request = { searchExpression: vm.searchExpression };
+
+            fetch("/api/search", { method: "POST", body: JSON.stringify(request) })
+                .then(response => response.json())
+                .then(function (response) {
+
+                    vm.searchResult = response.result;
+
+                    vm.debugMessage = "Search completed";
                 });
         }
     },

@@ -9,10 +9,13 @@ import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.StreamingCore;
 import so.blacklight.blacksound.crypto.Crypto;
 import so.blacklight.blacksound.names.NameGenerator;
+import so.blacklight.blacksound.stream.Song;
 import so.blacklight.blacksound.subscriber.Subscriber;
 import so.blacklight.blacksound.subscriber.SubscriberId;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class StatusHandler implements VertxHandler {
 
@@ -49,7 +52,9 @@ public class StatusHandler implements VertxHandler {
     private StatusResponse authenticatedResponse(final Subscriber subscriber) {
         final var generatedName = new NameGenerator().generate(subscriber.getId().toString());
         final var currentTrack = subscriber.getCurrentTrack();
-        return new AuthenticatedStatusResponse(generatedName, subscriber.isEnabled(), currentTrack);
+        final var playlist = core.getChannel().getPlaylist();
+
+        return new AuthenticatedStatusResponse(generatedName, subscriber.isStreamingEnabled(), currentTrack, playlist);
     }
 
     private StatusResponse unauthenticatedResponse(final String error) {
@@ -86,13 +91,15 @@ public class StatusHandler implements VertxHandler {
         public final String name;
         public final boolean streamingEnabled;
         public final String currentTrack;
+        public final List<String> playlist;
 
-        public AuthenticatedStatusResponse(final String name, final boolean streamingEnabled, final String currentTrack) {
+        public AuthenticatedStatusResponse(final String name, final boolean streamingEnabled, final String currentTrack, final List<Song> playlist) {
             super(true);
 
             this.name = name;
             this.streamingEnabled = streamingEnabled;
             this.currentTrack = currentTrack;
+            this.playlist = playlist.stream().map(Song::getFullTitle).collect(Collectors.toList());
         }
 
     }

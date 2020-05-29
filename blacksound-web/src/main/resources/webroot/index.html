@@ -23,39 +23,30 @@
                 to log in using your Spotify account
             </div>
         </div>
-        <div class="controls">
-            <span v-if="user.streamingEnabled" class="btn">
+        <div v-if="user.hasSession" class="controls">
+            <span v-if="user.streamingEnabled" v-on:click="pauseStreaming" class="btn">
               &#10074;&#10074;
             </span>
-            <span v-else class="btn">
+            <span v-else v-on:click="startStreaming" class="btn">
               ▶
             </span>
         </div>
         <div class="searchbox">
             <div class="searchbox-input">
-                <input type="text" placeholder="Enter spotify URI" />
-                <div class="btn submit">
+                <input type="text" placeholder="Enter spotify URI, eg. spotify:track:22GbAGb80ZZNgm2yrBMnpR" />
+                <div v-on:click="queueTrack" class="btn submit">
                     Queue this song
                 </div>
             </div>
             <div class="searchbox-input">
-                <input type="text" placeholder="Enter song title" />
-                <div class="btn submit">
+                <input v-model="searchExpression" type="text" placeholder="Enter song title" />
+                <div v-on:click="searchSong" class="btn submit">
                     Search
                 </div>
             </div>
             <div class="searchbox-results">
-                <div class="searchbox-result">
-                    Some song 1
-                </div>
-                <div class="searchbox-result">
-                    Some song 2
-                </div>
-                <div class="searchbox-result">
-                    Some song 3
-                </div>
-                <div class="searchbox-result">
-                    Some song 4
+                <div v-for="result in searchResult" class="searchbox-result">
+                    {{ result }}
                 </div>
             </div>
         </div>
@@ -64,14 +55,8 @@
                 Coming up next:
             </div>
             <div class="playlist-items">
-                <div class="playlist-item">
+                <div v-for="song in playlist" :key="song.title" class="playlist-item">
                     Metallica - One
-                </div>
-                <div class="playlist-item">
-                    Motörhead - Sympathy for the Devil
-                </div>
-                <div class="playlist-item">
-                    Oh noes! We have run out of items
                 </div>
             </div>
         </div>

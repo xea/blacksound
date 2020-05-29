@@ -22,4 +22,12 @@ public interface Identifiable<T extends Id<?, ?>> {
             return getId().equals(other.getId());
         }
     }
+
+    default boolean equalsId(final T otherId) {
+        if (otherId == null) {
+            return false;
+        } else {
+            return getId().equals(otherId);
+        }
+    }
 }

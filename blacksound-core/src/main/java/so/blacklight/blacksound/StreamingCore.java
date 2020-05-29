@@ -99,7 +99,7 @@ public class StreamingCore {
 
         final var expires = Instant.now().plus(credentials.getExpiresIn(), ChronoUnit.SECONDS);
 
-        subscribers.add(new Subscriber(id, api, expires, Subscriber.ENABLED));
+        subscribers.add(new Subscriber(id, api, expires, Subscriber.DISABLED));
 
         updateSubscribers();
 
@@ -191,5 +191,17 @@ public class StreamingCore {
         return Option.ofOptional(subscribers.stream()
                 .filter(subscriber -> subscriber.getId().equals(subscriberId))
                 .findAny());
+    }
+
+    public boolean unregister(final SubscriberId id) {
+        final var removed = subscribers.removeIf(subscriber -> subscriber.equalsId(id));
+
+        updateSubscribers();
+
+        return removed;
+    }
+
+    public Channel getChannel() {
+        return channel;
     }
 }

@@ -35,4 +35,8 @@ public class Song {
     public long getLength(final TimeUnit timeUnit) {
         return timeUnit.convert(Duration.of(length, ChronoUnit.SECONDS));
     }
+
+    public String getFullTitle() {
+        return String.format("%s / %s", artist, title);
+    }
 }
