@@ -1,4 +1,93 @@
-.app
-  border: 1px solid black
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300&display=swap')
 
+$app-width: 600px
+$background-color: #111
+$text-color: #ccc
+$green: #30cc30
+$yellow: #cb9
 
+@mixin notch
+  --notchSize: 7px
+
+  clip-path: polygon(0% var(--notchSize), var(--notchSize) 0%, 100% 0%, 100% 100%, 100% calc(100% - var(--notchSize)), calc(100% - var(--notchSize)) 100%, 0% 100%, 0% 100%)
+
+*
+  font-family: "Noto Sans JP", sans-serif
+
+@mixin generic-button
+  @include notch
+  cursor: pointer
+  display: block
+  background-color: $green
+  border-bottom: 3px solid $green - #222
+  color: white
+  padding: 7px 14px 7px 14px
+  margin-left: 10px
+  margin-right: 10px
+
+  &:hover
+    background-color: $green + #101010
+
+body
+  background-color: $background-color
+  color: $text-color
+
+  h1
+    text-align: center
+
+  #app
+    @include notch
+    background-color: $background-color + #101010
+    max-width: $app-width
+    margin: auto
+    padding: 20px
+
+    a
+      color: $green
+
+    .debugBar
+      color: #444
+      font-size: 11px
+
+    .profile
+      padding: 10px
+      .anonymous
+      .authenticated
+    .controls
+      padding: 10px
+      display: flex
+      justify-content: space-between
+    .searchbox
+      padding: 10px
+      height: 100px
+      display: flex
+      flex-direction: column
+      justify-content: space-between
+      .searchbox-input
+        display: flex
+        justify-content: flex-start
+        input
+          @include notch
+          flex-grow: 1
+          max-width: 350px
+          padding-left: 10px
+          padding-right: 10px
+        .submit
+          flex-grow: 0
+      .searchbox-results
+        display: none
+        position: absolute
+        background: white
+        min-width: 400px
+        padding: 2px
+        .searchbox-result
+          font-size: 0.8em
+    .playlist
+      padding: 10px
+      .playlist-header
+      .playlist-items
+        .playlist-item
+          color: $yellow
+
+.btn
+  @include generic-button

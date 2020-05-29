@@ -1,56 +1,65 @@
 package so.blacklight.blacksound.web.handler;
 
 import io.vavr.control.Option;
+import io.vertx.core.Vertx;
 import io.vertx.core.http.Cookie;
 import io.vertx.ext.web.RoutingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.StreamingCore;
 import so.blacklight.blacksound.crypto.Crypto;
+import so.blacklight.blacksound.names.NameGenerator;
 import so.blacklight.blacksound.subscriber.Subscriber;
 import so.blacklight.blacksound.subscriber.SubscriberId;
+
+import java.util.concurrent.CompletableFuture;
 
 public class StatusHandler implements VertxHandler {
 
     private final StreamingCore core;
+    private final Vertx vertx;
     private final Crypto crypto;
     private final Logger log = LogManager.getLogger(getClass());
 
-    public StatusHandler(final StreamingCore core, final Crypto crypto) {
+    public StatusHandler(final StreamingCore core, final Vertx vertx, final Crypto crypto) {
         this.core = core;
+        this.vertx = vertx;
         this.crypto = crypto;
     }
 
     @Override
-    public void handle(RoutingContext routingContext) {
-        final var response = Option.of(routingContext.getCookie(SESSION_KEY))
-                .peek(cookie -> log.debug("Found session cookie"))
-                .map(Cookie::getValue)
-                .flatMap(encryptedId -> crypto.decode64AndDecrypt(encryptedId).toOption())
-                .map(String::new)
-                .peek(sessionId -> log.debug("Session has id {}", sessionId))
-                .map(SubscriberId::new)
-                .toJavaOptional()
-                .flatMap(core::findSubscriber)
-                .map(this::authenticatedResponse)
-                .orElseGet(this::unauthenticatedResponse);
+    public void handle(final RoutingContext routingContext) {
+        CompletableFuture.runAsync(() -> {
+            final var response = Option.of(routingContext.getCookie(SESSION_KEY))
+                    .peek(cookie -> log.debug("Found session cookie"))
+                    .map(Cookie::getValue)
+                    .toValidation(() -> "Subscriber cookie was not found")
+                    .flatMap(crypto::decode64AndDecrypt)
+                    .map(String::new)
+                    .peek(sessionId -> log.debug("Session has id {}", sessionId))
+                    .map(SubscriberId::new)
+                    .flatMap(id -> core.findSubscriber(id).toValidation(() -> "No such subscriber"))
+                    .map(this::authenticatedResponse)
+                    .getOrElseGet(this::unauthenticatedResponse);
 
-        routingContext.response().end(asJson(response));
+            routingContext.response().end(asJson(response));
+        }, vertx.nettyEventLoopGroup());
     }
 
     private StatusResponse authenticatedResponse(final Subscriber subscriber) {
+        final var generatedName = new NameGenerator().generate(subscriber.getId().toString());
         final var currentTrack = subscriber.getCurrentTrack();
-        return new AuthenticatedStatusResponse(subscriber.getId().toString(), subscriber.isEnabled(), currentTrack);
+        return new AuthenticatedStatusResponse(generatedName, subscriber.isEnabled(), currentTrack);
     }
 
-    private StatusResponse unauthenticatedResponse() {
+    private StatusResponse unauthenticatedResponse(final String error) {
         return new UnauthenticatedStatusResponse(core.getAuthorizationURI().toASCIIString());
     }
 
     /**
      * Base class for supplying mandatory response parameters
      */
-    static abstract class StatusResponse {
+    abstract static class StatusResponse {
 
         public final boolean hasSession;
         public final String status;

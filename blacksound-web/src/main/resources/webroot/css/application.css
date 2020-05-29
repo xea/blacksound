@@ -1,3 +1,72 @@
-.app {
-  border: 1px solid black; }
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300&display=swap");
+* {
+  font-family: "Noto Sans JP", sans-serif; }
+
+body {
+  background-color: #111;
+  color: #ccc; }
+  body h1 {
+    text-align: center; }
+  body #app {
+    --notchSize: 7px;
+    clip-path: polygon(0% var(--notchSize), var(--notchSize) 0%, 100% 0%, 100% 100%, 100% calc(100% - var(--notchSize)), calc(100% - var(--notchSize)) 100%, 0% 100%, 0% 100%);
+    background-color: #212121;
+    max-width: 600px;
+    margin: auto;
+    padding: 20px; }
+    body #app a {
+      color: #30cc30; }
+    body #app .debugBar {
+      color: #444;
+      font-size: 11px; }
+    body #app .profile {
+      padding: 10px; }
+    body #app .controls {
+      padding: 10px;
+      display: flex;
+      justify-content: space-between; }
+    body #app .searchbox {
+      padding: 10px;
+      height: 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between; }
+      body #app .searchbox .searchbox-input {
+        display: flex;
+        justify-content: flex-start; }
+        body #app .searchbox .searchbox-input input {
+          --notchSize: 7px;
+          clip-path: polygon(0% var(--notchSize), var(--notchSize) 0%, 100% 0%, 100% 100%, 100% calc(100% - var(--notchSize)), calc(100% - var(--notchSize)) 100%, 0% 100%, 0% 100%);
+          flex-grow: 1;
+          max-width: 350px;
+          padding-left: 10px;
+          padding-right: 10px; }
+        body #app .searchbox .searchbox-input .submit {
+          flex-grow: 0; }
+      body #app .searchbox .searchbox-results {
+        display: none;
+        position: absolute;
+        background: white;
+        min-width: 400px;
+        padding: 2px; }
+        body #app .searchbox .searchbox-results .searchbox-result {
+          font-size: 0.8em; }
+    body #app .playlist {
+      padding: 10px; }
+      body #app .playlist .playlist-items .playlist-item {
+        color: #cb9; }
+
+.btn {
+  --notchSize: 7px;
+  clip-path: polygon(0% var(--notchSize), var(--notchSize) 0%, 100% 0%, 100% 100%, 100% calc(100% - var(--notchSize)), calc(100% - var(--notchSize)) 100%, 0% 100%, 0% 100%);
+  cursor: pointer;
+  display: block;
+  background-color: #30cc30;
+  border-bottom: 3px solid #0eaa0e;
+  color: white;
+  padding: 7px 14px 7px 14px;
+  margin-left: 10px;
+  margin-right: 10px; }
+  .btn:hover {
+    background-color: #40dc40; }
 

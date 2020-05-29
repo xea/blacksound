@@ -84,7 +84,7 @@ public class Server {
         router.route("/api/queue").handler(BodyHandler.create()).handler(new QueueHandler(core, vertx));
         // This exposes our redirect URI to the frontend
         router.route("/api/redirect-uri").handler(new RedirectURIHandler(core));
-        router.route("/api/status").handler(new StatusHandler(core, crypto));
+        router.route("/api/status").handler(new StatusHandler(core, vertx, crypto));
 
 
         // TODO we'll need to hide this call behind an authorization check once we've got users

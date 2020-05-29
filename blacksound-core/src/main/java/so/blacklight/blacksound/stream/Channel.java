@@ -18,7 +18,6 @@ public class Channel {
     private Song currentTrack;
     private Instant currentTrackStartTime;
 
-
     public Channel(final Consumer<Song> trackChangeListener) {
         this.trackChangeListener = trackChangeListener;
     }

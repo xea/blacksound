@@ -1,3 +1,51 @@
+"use strict";
+
+let vm = new Vue({
+    el: '#app',
+    data: {
+        debugMessage: "Uninitialized",
+        spotify: {
+            currentTrackTitle: undefined,
+            redirectUri: undefined,
+            trackUri: undefined
+        },
+        user: {
+            hasSession: false,
+            name: "Some random dude",
+            logoutUri: "/api/logout",
+            streamingEnabled: undefined
+        }
+    },
+    methods: {
+        init: function() {
+            vm.debugMessage = "Initializing";
+
+            fetch("/api/status")
+                .then(response => response.json())
+                .then(function (response) {
+                    vm.user.hasSession = response.hasSession;
+                    vm.debugMessage = response.status;
+
+                    if (response.hasSession) {
+                        vm.user.name = response.name;
+                        vm.user.streamingEnabled = response.streamingEnabled;
+                        vm.spotify.currentTrack = response.currentTrack;
+                    } else {
+                        vm.spotify.redirectUri = response.redirectUri;
+                    }
+
+                    vm.debugMessage = "Ready";
+                });
+        }
+    },
+    mounted: function() {
+        this.$nextTick(function() {
+            this.init();
+        })
+    }
+});
+
+/*
 let _ = new Vue({
     el: '#app',
     data: {
@@ -83,3 +131,4 @@ let _ = new Vue({
         })
     }
 });
+ */

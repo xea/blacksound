@@ -5,6 +5,7 @@ import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredentials;
 import com.wrapper.spotify.model_objects.specification.Track;
+import io.vavr.control.Option;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -115,11 +116,15 @@ public class StreamingCore {
         }
     }
 
-    public void playTrack(final Song trackUri) {
+    protected void playTrack(final Song song) {
+        playTrack(song.getUri());
+    }
+
+    public void playTrack(final String trackUri) {
         subscribers.forEach(subscriber -> {
             final var playRequest = subscriber.getApi()
                     .startResumeUsersPlayback()
-                    .uris(JsonParser.parseString("[ \"" + trackUri.getUri() + "\" ]").getAsJsonArray())
+                    .uris(JsonParser.parseString("[ \"" + trackUri + "\" ]").getAsJsonArray())
                     .build();
 
             try {
@@ -182,9 +187,9 @@ public class StreamingCore {
         log.info("Refreshed {} access tokens", refreshed);
     }
 
-    public Optional<Subscriber> findSubscriber(final SubscriberId subscriberId) {
-        return subscribers.stream()
+    public Option<Subscriber> findSubscriber(final SubscriberId subscriberId) {
+        return Option.ofOptional(subscribers.stream()
                 .filter(subscriber -> subscriber.getId().equals(subscriberId))
-                .findAny();
+                .findAny());
     }
 }

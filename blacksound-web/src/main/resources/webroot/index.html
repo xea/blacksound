@@ -6,11 +6,81 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Blacksound</title>
+    <link rel="stylesheet" href="/static/css/application.css" />
     <script src="/static/js/vue.prod.js"></script>
 </head>
 <body>
     <h1>Blacksound</h1>
+    <div id="app">
+        <div class="profile">
+            <div v-if="user.hasSession" class="authenticated">
+                You are logged in as {{ user.name }}.
+                <a v-bind:href="user.logoutUri">Log out</a>
+            </div>
+            <div v-else class="anonymous">
+                You are not logged in,
+                <a v-bind:href="spotify.redirectUri">click here</a>
+                to log in using your Spotify account
+            </div>
+        </div>
+        <div class="controls">
+            <span v-if="user.streamingEnabled" class="btn">
+              &#10074;&#10074;
+            </span>
+            <span v-else class="btn">
+              ▶
+            </span>
+        </div>
+        <div class="searchbox">
+            <div class="searchbox-input">
+                <input type="text" placeholder="Enter spotify URI" />
+                <div class="btn submit">
+                    Queue this song
+                </div>
+            </div>
+            <div class="searchbox-input">
+                <input type="text" placeholder="Enter song title" />
+                <div class="btn submit">
+                    Search
+                </div>
+            </div>
+            <div class="searchbox-results">
+                <div class="searchbox-result">
+                    Some song 1
+                </div>
+                <div class="searchbox-result">
+                    Some song 2
+                </div>
+                <div class="searchbox-result">
+                    Some song 3
+                </div>
+                <div class="searchbox-result">
+                    Some song 4
+                </div>
+            </div>
+        </div>
+        <div class="playlist">
+            <div class="playlist-header">
+                Coming up next:
+            </div>
+            <div class="playlist-items">
+                <div class="playlist-item">
+                    Metallica - One
+                </div>
+                <div class="playlist-item">
+                    Motörhead - Sympathy for the Devil
+                </div>
+                <div class="playlist-item">
+                    Oh noes! We have run out of items
+                </div>
+            </div>
+        </div>
+        <div class="debugBar">
+            {{ debugMessage }}
+        </div>
+    </div>
 
+    <!--
     <div id="app">
         <div>Status: {{ statusMessage }}</div>
 
@@ -43,6 +113,7 @@
             </div>
         </div>
     </div>
+    -->
 
     <script src="/static/js/application.js"></script>
 </body>
