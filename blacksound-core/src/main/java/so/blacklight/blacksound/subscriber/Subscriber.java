@@ -1,12 +1,18 @@
 package so.blacklight.blacksound.subscriber;
 
 import com.wrapper.spotify.SpotifyApi;
+import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.specification.Track;
+import io.vavr.control.Option;
 import io.vavr.control.Try;
+import io.vavr.control.Validation;
+import org.apache.hc.core5.http.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.id.Identifiable;
+import so.blacklight.blacksound.stream.Song;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
@@ -100,4 +106,19 @@ public class Subscriber implements Identifiable<SubscriberId> {
                 })
                 .getOrElse("None");
     }
+
+    public Validation<String, Song> lookupSong(final String trackUri) {
+        /*
+        return Try.of(() -> getApi().getTrack(trackUri).build().execute()).map(Song::new)
+                .toValidation(Throwable::getMessage);
+
+         */
+        try {
+            return Validation.valid(new Song(getApi().getTrack(trackUri).build().execute()));
+        } catch (ParseException | SpotifyWebApiException | IOException e) {
+            e.printStackTrace();
+            return Validation.invalid(e.getMessage());
+        }
+    }
+
 }

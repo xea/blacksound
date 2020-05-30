@@ -22,7 +22,6 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
@@ -135,16 +134,8 @@ public class StreamingCore {
         });
     }
 
-    public void queue(final String trackUri) {
-        try {
-            final Track track = spotifyApi.getTrack(trackUri).build().execute();
-            final Song song = new Song(track);
-
-            channel.queueTrack(song);
-        } catch (ParseException | SpotifyWebApiException | IOException e) {
-            log.error("Could not queue track", e);
-        }
-
+    public boolean queue(final Song song) {
+        return channel.queueTrack(song);
     }
 
     public void play() {

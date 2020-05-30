@@ -23,12 +23,14 @@ public class Channel {
         this.trackChangeListener = trackChangeListener;
     }
 
-    public void queueTrack(final Song song) {
+    public boolean queueTrack(final Song song) {
         if (queue.isEmpty()) {
             playTrack(song);
         }
 
         queue.addLast(song);
+
+        return true;
     }
 
     private void playTrack(final Song song) {

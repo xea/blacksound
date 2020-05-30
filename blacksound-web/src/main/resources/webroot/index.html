@@ -33,7 +33,7 @@
         </div>
         <div class="searchbox">
             <div class="searchbox-input">
-                <input type="text" placeholder="Enter spotify URI, eg. spotify:track:22GbAGb80ZZNgm2yrBMnpR" />
+                <input v-model="spotify.trackUri" type="text" placeholder="Enter spotify URI, eg. spotify:track:22GbAGb80ZZNgm2yrBMnpR" />
                 <div v-on:click="queueTrack" class="btn submit">
                     Queue this song
                 </div>

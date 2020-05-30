@@ -64,7 +64,9 @@ let vm = new Vue({
         queueTrack: function() {
             vm.debugMessage = "Queueing track";
 
-            fetch("/api/queue")
+            let request = { trackUri: vm.spotify.trackUri };
+
+            fetch("/api/queue", { method: "POST", body: JSON.stringify(request) })
                 .then(response => response.json())
                 .then(function (response) {
                     vm.debugMessage = "Track queued";
@@ -94,39 +96,7 @@ let vm = new Vue({
 
 /*
 let _ = new Vue({
-    el: '#app',
-    data: {
-        statusMessage: "Uninitialized",
-        spotify: {
-            authorizationCode: undefined,
-            currentTrack: undefined,
-            redirectUri: undefined,
-            trackUri: undefined
-        },
-        user: {
-            hasSession: false,
-            name: "<<Anonymous>>"
-        }
-    },
     methods: {
-        init: function() {
-            let vm = this;
-            vm.statusMessage = "Initializing";
-
-            fetch("/api/status")
-                .then(response => response.json())
-                .then(function (response) {
-                    vm.user.hasSession = response.hasSession;
-                    vm.statusMessage = response.status;
-
-                    if (response.hasSession) {
-                        vm.user.name = response.name;
-                        vm.spotify.currentTrack = response.currentTrack;
-                    } else {
-                        vm.spotify.redirectUri = response.redirectUri;
-                    }
-                });
-        },
         playTrack: function() {
             let vm = this;
             vm.statusMessage = "Playing track";
@@ -149,18 +119,6 @@ let _ = new Vue({
                     vm.statusMessage = "Playback paused";
                 })
         },
-        queueTrack: function() {
-            let vm = this;
-            vm.statusMessage = "Queueing track";
-
-            let request = { trackUri: vm.spotify.trackUri };
-
-            fetch("/api/queue", { method: "POST", body: JSON.stringify(request) })
-                .then(response => response.json())
-                .then(response => {
-                    vm.statusMessage = "Track queued";
-                })
-        },
         sendAuthorizationCode: function() {
             let vm = this;
             vm.statusMessage = "Sending authorization code";
@@ -172,10 +130,5 @@ let _ = new Vue({
                 })
         }
     },
-    mounted: function() {
-        this.$nextTick(function() {
-            this.init();
-        })
-    }
 });
  */
