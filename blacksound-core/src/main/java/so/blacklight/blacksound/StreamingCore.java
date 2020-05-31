@@ -58,6 +58,7 @@ public class StreamingCore {
         }));
 
         scheduler.scheduleAtFixedRate(this::refreshSubscribers, 0, 10, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(this::updateSubscribers, 15, 30, TimeUnit.SECONDS);
 
         channel = new Channel(this::playTrack);
     }

@@ -14,6 +14,8 @@ import so.blacklight.blacksound.subscriber.SubscriberId;
 
 import java.util.concurrent.CompletableFuture;
 
+import static so.blacklight.blacksound.web.handler.AuthenticatedHandler.SESSION_KEY;
+
 public class LogoutHandler implements VertxHandler {
 
     private final StreamingCore core;

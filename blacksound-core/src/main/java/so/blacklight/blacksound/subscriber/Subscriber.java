@@ -108,17 +108,26 @@ public class Subscriber implements Identifiable<SubscriberId> {
     }
 
     public Validation<String, Song> lookupSong(final String trackUri) {
-        /*
-        return Try.of(() -> getApi().getTrack(trackUri).build().execute()).map(Song::new)
-                .toValidation(Throwable::getMessage);
+        if (Objects.isNull(trackUri)) {
+            return Validation.invalid("Null track id");
+        } else {
+            final var sanitizedTrackUri = trackUri.trim();
 
-         */
-        try {
-            return Validation.valid(new Song(getApi().getTrack(trackUri).build().execute()));
-        } catch (ParseException | SpotifyWebApiException | IOException e) {
-            e.printStackTrace();
-            return Validation.invalid(e.getMessage());
+            if (sanitizedTrackUri.startsWith("spotify:track:")) {
+                return Try.of(() -> getApi()
+                            .getTrack(sanitizedTrackUri.substring(14))
+                            .build()
+                            .execute())
+                        .map(Song::new)
+                        .toValidation(Throwable::getMessage);
+            } else {
+                return Validation.invalid("Not a track URI");
+            }
         }
+
     }
 
+    public void enableStreaming() {
+        streamingEnabled = ENABLED;
+    }
 }

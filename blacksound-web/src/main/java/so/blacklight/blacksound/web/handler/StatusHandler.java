@@ -4,6 +4,8 @@ import io.vavr.control.Option;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.Cookie;
 import io.vertx.ext.web.RoutingContext;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.StreamingCore;
@@ -16,6 +18,8 @@ import so.blacklight.blacksound.subscriber.SubscriberId;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+
+import static so.blacklight.blacksound.web.handler.AuthenticatedHandler.SESSION_KEY;
 
 public class StatusHandler implements VertxHandler {
 
@@ -45,7 +49,10 @@ public class StatusHandler implements VertxHandler {
                     .map(this::authenticatedResponse)
                     .getOrElseGet(this::unauthenticatedResponse);
 
-            routingContext.response().end(asJson(response));
+            final var httpResponse = routingContext.response();
+
+            httpResponse.putHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+            httpResponse.end(asJson(response));
         }, vertx.nettyEventLoopGroup());
     }
 

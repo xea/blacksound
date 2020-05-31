@@ -49,6 +49,7 @@ let vm = new Vue({
             fetch("/api/resume")
                 .then(response => response.json())
                 .then(function (response) {
+                    vm.user.streamingEnabled = response.streamingEnabled;
                     vm.debugMessage = "Streaming started";
                 });
         },
@@ -58,6 +59,7 @@ let vm = new Vue({
             fetch("/api/pause")
                 .then(response => response.json())
                 .then(function (response) {
+                    vm.user.streamingEnabled = response.streamingEnabled;
                     vm.debugMessage = "Streaming paused";
                 });
         },

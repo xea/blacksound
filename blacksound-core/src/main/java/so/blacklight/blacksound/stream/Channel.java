@@ -26,9 +26,9 @@ public class Channel {
     public boolean queueTrack(final Song song) {
         if (queue.isEmpty()) {
             playTrack(song);
+        } else {
+            queue.addLast(song);
         }
-
-        queue.addLast(song);
 
         return true;
     }

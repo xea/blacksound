@@ -8,12 +8,12 @@ import so.blacklight.blacksound.StreamingCore;
 
 import java.util.concurrent.CompletableFuture;
 
-public class PauseResumeHandler implements VertxHandler {
+public class PauseHandler implements VertxHandler {
 
     private final StreamingCore core;
     private final Vertx vertx;
 
-    public PauseResumeHandler(final StreamingCore core, final Vertx vertx) {
+    public PauseHandler(final StreamingCore core, final Vertx vertx) {
         this.core = core;
         this.vertx = vertx;
     }
@@ -25,7 +25,7 @@ public class PauseResumeHandler implements VertxHandler {
 
             final var response = routingContext.response();
             response.putHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
-            response.end(asJson(new ResumeResponse("ok")));
+            response.end(asJson(new ResumeResponse("ok", false)));
         }, vertx.nettyEventLoopGroup());
 
     }
@@ -33,9 +33,11 @@ public class PauseResumeHandler implements VertxHandler {
     private static class ResumeResponse {
 
         public final String status;
+        public final boolean streamingEnabled;
 
-        public ResumeResponse(final String status) {
+        public ResumeResponse(final String status, final boolean streamingEnabled) {
             this.status = status;
+            this.streamingEnabled = streamingEnabled;
         }
     }
 }

@@ -17,6 +17,8 @@ import so.blacklight.blacksound.crypto.Crypto;
 
 import java.net.URI;
 
+import static so.blacklight.blacksound.web.handler.AuthenticatedHandler.SESSION_KEY;
+
 /**
  * Accepts callbacks from Spotify when a user authorizes us and we are provided with an authorization code. We need to
  * use this code to send back to Spotify in exchange for an access token and refresh token that will allow us to act
