@@ -9,9 +9,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.StreamingCore;
 import so.blacklight.blacksound.crypto.Crypto;
+import so.blacklight.blacksound.stream.Song;
 import so.blacklight.blacksound.subscriber.SubscriberId;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static so.blacklight.blacksound.web.handler.AuthenticatedHandler.SESSION_KEY;
 
@@ -44,7 +48,7 @@ public class QueueHandler implements VertxHandler {
                     .flatMap(id -> core.findSubscriber(id).toValidation(() -> "No such subscriber"))
                     .flatMap(subscriber -> subscriber.lookupSong(request.trackUri))
                     .map(core::queue)
-                    .map(e -> new QueueResponse("ok"))
+                    .map(e -> new QueueResponse("ok", core.getChannel().getPlaylist().stream().map(Song::getFullTitle).collect(Collectors.toList())))
                     .getOrElseGet(QueueResponse::new);
 
             routingContext.response().end(asJson(queueResponse));
@@ -55,14 +59,22 @@ public class QueueHandler implements VertxHandler {
 
         private String trackUri;
 
+        private List<String> playlist;
     }
 
     private static class QueueResponse {
 
         private final String status;
 
+        private final List<String> playlist;
+
         public QueueResponse(final String status) {
+            this(status, Collections.emptyList());
+        }
+
+        public QueueResponse(final String status, final List<String> playlist) {
             this.status = status;
+            this.playlist = playlist;
         }
     }
 }

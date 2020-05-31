@@ -35,6 +35,7 @@ let vm = new Vue({
                         vm.user.name = response.name;
                         vm.user.streamingEnabled = response.streamingEnabled;
                         vm.spotify.currentTrack = response.currentTrack;
+                        vm.playlist = response.playlist;
                     } else {
                         vm.spotify.redirectUri = response.redirectUri;
                         vm.user.streamingEnabled = false;
@@ -71,6 +72,8 @@ let vm = new Vue({
             fetch("/api/queue", { method: "POST", body: JSON.stringify(request) })
                 .then(response => response.json())
                 .then(function (response) {
+                    vm.playlist = response.playlist;
+                    vm.spotify.trackUri = undefined;
                     vm.debugMessage = "Track queued";
                 });
         },
@@ -95,42 +98,3 @@ let vm = new Vue({
         })
     }
 });
-
-/*
-let _ = new Vue({
-    methods: {
-        playTrack: function() {
-            let vm = this;
-            vm.statusMessage = "Playing track";
-
-            let request = { trackUri: vm.spotify.trackUri };
-
-            fetch("/api/play", { method: "POST", body: JSON.stringify(request) })
-                .then(response => response.json())
-                .then(response => {
-                    vm.statusMessage = "Playing your stupid track";
-                })
-        },
-        pause: function() {
-            let vm = this;
-            vm.statusMessage = "Pausing track";
-
-            fetch("/api/pause")
-                .then(response => response.json())
-                .then(response => {
-                    vm.statusMessage = "Playback paused";
-                })
-        },
-        sendAuthorizationCode: function() {
-            let vm = this;
-            vm.statusMessage = "Sending authorization code";
-
-            fetch("/spotify-redirect?code=" + vm.spotify.authorizationCode)
-                .then(response => response.json())
-                .then(response => {
-                    vm.statusMessage = "Authorization code processed";
-                })
-        }
-    },
-});
- */

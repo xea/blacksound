@@ -56,7 +56,7 @@
             </div>
             <div class="playlist-items">
                 <div v-for="song in playlist" :key="song.title" class="playlist-item">
-                    Metallica - One
+                    {{ song }}
                 </div>
             </div>
         </div>
@@ -64,42 +64,6 @@
             {{ debugMessage }}
         </div>
     </div>
-
-    <!--
-    <div id="app">
-        <div>Status: {{ statusMessage }}</div>
-
-        <div v-if="user.hasSession">
-            You are logged in as {{ user.name }}
-
-            <div>
-                You're currently playing: {{ spotify.currentTrack }}
-            </div>
-
-            <div>
-                Now try playing this track:
-                <input id="trackUri" v-model="spotify.trackUri" width="40" />
-                <button id="queueTrack" v-on:click="queueTrack">Queue track</button>
-                <button id="playTrackNow" v-on:click="playTrack">Play track</button>
-                <button id="pause" v-on:click="pause">Pause</button>
-            </div>
-        </div>
-        <div v-else>
-            You are not logged in yet,
-            <a v-bind:href="spotify.redirectUri">click here</a>
-            to authenticate with Spotify
-
-            <div>
-                Alternatively, paste authorization code below and click 'Authorize me':
-                <div>
-                    <input id="authorizationCode" v-model="spotify.authorizationCode" width="40" />
-                    <button id="sendAuthorizationCode" v-on:click="sendAuthorizationCode">Authorize me</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    -->
-
     <script src="/static/js/application.js"></script>
 </body>
 </html>

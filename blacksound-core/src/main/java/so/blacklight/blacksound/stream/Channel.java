@@ -1,6 +1,8 @@
 package so.blacklight.blacksound.stream;
 
 import io.vavr.control.Option;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.time.Instant;
 import java.util.*;
@@ -15,6 +17,7 @@ public class Channel {
     private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(4);
     private final Deque<Song> queue = new ConcurrentLinkedDeque<>();
     private final Consumer<Song> trackChangeListener;
+    private final Logger log = LogManager.getLogger(getClass());
 
     private Song currentTrack;
     private Instant currentTrackStartTime;
@@ -24,7 +27,8 @@ public class Channel {
     }
 
     public boolean queueTrack(final Song song) {
-        if (queue.isEmpty()) {
+        if (queue.isEmpty() && currentTrack == null) {
+            log.info("Playlist is empty, playing song {}", song.getFullTitle());
             playTrack(song);
         } else {
             queue.addLast(song);
@@ -47,7 +51,11 @@ public class Channel {
         final var nextTrack = queue.pop();
 
         if (Objects.nonNull(nextTrack)) {
+            log.info("Playing next song: {}", nextTrack.getFullTitle());
             playTrack(nextTrack);
+        } else {
+            log.info("Playlist exhausted, stopping stream");
+            currentTrack = null;
         }
     }
 
