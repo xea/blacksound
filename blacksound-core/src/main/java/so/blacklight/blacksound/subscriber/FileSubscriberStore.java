@@ -44,16 +44,12 @@ public class FileSubscriberStore implements SubscriberStore {
     public Set<SubscriberHandle> loadEntries() {
         final var storePath = storeFile.toPath();
 
-        if (!Files.exists(storeFile.toPath())) {
-            Try.run(() -> Files.createFile(storePath));
-        }
-
-        try (final var fileReader = Files.newBufferedReader(storeFile.toPath())) {
+        try (final var fileReader = Files.newBufferedReader(storePath)) {
             final var typeToken = new TypeToken<Set<SubscriberHandle>>() {};
 
             return new Gson().fromJson(fileReader, typeToken.getType());
         } catch (IOException e) {
-            log.error("Error while loading subscribers from file store", e);
+            log.error("Error while loading subscribers from file store: {}", e.getMessage());
         }
 
         return Collections.emptySet();

@@ -4,7 +4,6 @@ import com.google.gson.JsonParser;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredentials;
-import com.wrapper.spotify.model_objects.specification.Track;
 import io.vavr.control.Option;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.logging.log4j.LogManager;

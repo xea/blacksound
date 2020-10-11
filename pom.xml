@@ -25,6 +25,8 @@
         <tink.version>1.4.0-rc2</tink.version>
         <vavr.version>1.0.0-alpha-3</vavr.version>
         <vertx.version>3.9.0</vertx.version>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencyManagement>
