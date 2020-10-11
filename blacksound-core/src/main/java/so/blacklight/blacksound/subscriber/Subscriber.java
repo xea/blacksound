@@ -195,7 +195,7 @@ public class Subscriber implements Identifiable<SubscriberId> {
         return Collections.emptyList();
     }
 
-    public void setActiveDevice(final String deviceId) {
+    public List<Device> setActiveDevice(final String deviceId) {
         JsonArray deviceIds = new JsonArray();
         deviceIds.add(deviceId);
 
@@ -208,6 +208,8 @@ public class Subscriber implements Identifiable<SubscriberId> {
         } catch (ParseException | SpotifyWebApiException | IOException e) {
             log.error("Error setting active device {}", e.getMessage());
         }
+
+        return getDevices();
     }
 
     public void pause() {

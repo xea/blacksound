@@ -118,6 +118,7 @@ let vm = new Vue({
             fetch("/api/set-device", { method: "POST", body: JSON.stringify(request) })
                 .then(response => response.json())
                 .then(function (response) {
+                    vm.devices = response.devices;
                     vm.debugMessage = "Active device set";
                 });
         },
