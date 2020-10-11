@@ -10,6 +10,7 @@
     <modules>
         <module>blacksound-core</module>
         <module>blacksound-web</module>
+        <module>blacksound-data</module>
     </modules>
     <packaging>pom</packaging>
     <name>Blacksound</name>
@@ -33,6 +34,12 @@
             <dependency>
                 <groupId>so.blacklight</groupId>
                 <artifactId>blacksound-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>so.blacklight</groupId>
+                <artifactId>blacksound-data</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

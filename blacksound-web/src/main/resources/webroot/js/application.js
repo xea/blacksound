@@ -16,7 +16,7 @@ let vm = new Vue({
             streamingEnabled: undefined
         },
         playlist: [
-            { title: "Metallica / One", uri: "spotify:track:asdfasdf" }
+            //{ title: "Metallica / One", uri: "spotify:track:asdfasdf" }
         ],
         searchExpression: undefined,
         searchResult: undefined
@@ -42,6 +42,15 @@ let vm = new Vue({
                     }
 
                     vm.debugMessage = "Ready";
+                });
+        },
+        loadPlaylist: function() {
+            vm.debugMessage = "Loading playlist";
+
+            fetch("/api/playlist")
+                .then(response => response.json())
+                .then(response => {
+                    vm.debugMessage = "Playlist loaded";
                 });
         },
         startStreaming: function() {

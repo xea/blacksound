@@ -16,9 +16,9 @@ public abstract class AuthenticatedHandler extends AbstractHandler {
 
     public static final String SESSION_KEY = "subscriber-id";
 
-    private final StreamingCore core;
-    private final Vertx vertx;
-    private final Crypto crypto;
+    protected final StreamingCore core;
+    protected final Vertx vertx;
+    protected final Crypto crypto;
 
     public AuthenticatedHandler(final StreamingCore core, final Vertx vertx, final Crypto crypto) {
         this.core = core;

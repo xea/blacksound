@@ -2,6 +2,7 @@ package so.blacklight.blacksound.subscriber;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import io.vavr.control.Try;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -41,6 +42,12 @@ public class FileSubscriberStore implements SubscriberStore {
 
     @Override
     public Set<SubscriberHandle> loadEntries() {
+        final var storePath = storeFile.toPath();
+
+        if (!Files.exists(storeFile.toPath())) {
+            Try.run(() -> Files.createFile(storePath));
+        }
+
         try (final var fileReader = Files.newBufferedReader(storeFile.toPath())) {
             final var typeToken = new TypeToken<Set<SubscriberHandle>>() {};
 
