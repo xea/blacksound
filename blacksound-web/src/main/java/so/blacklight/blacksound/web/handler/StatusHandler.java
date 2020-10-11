@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.StreamingCore;
 import so.blacklight.blacksound.crypto.Crypto;
-import so.blacklight.blacksound.names.NameGenerator;
 import so.blacklight.blacksound.stream.Song;
 import so.blacklight.blacksound.subscriber.Subscriber;
 import so.blacklight.blacksound.subscriber.SubscriberId;
@@ -57,11 +56,11 @@ public class StatusHandler implements VertxHandler {
     }
 
     private StatusResponse authenticatedResponse(final Subscriber subscriber) {
-        final var generatedName = new NameGenerator().generate(subscriber.getId().toString());
+        final var name = subscriber.getProfileName();
         final var currentTrack = subscriber.getCurrentTrack();
         final var playlist = core.getChannel().getPlaylist();
 
-        return new AuthenticatedStatusResponse(generatedName, subscriber.isStreamingEnabled(), currentTrack, playlist);
+        return new AuthenticatedStatusResponse(name, subscriber.isStreamingEnabled(), currentTrack, playlist);
     }
 
     private StatusResponse unauthenticatedResponse(final String error) {
