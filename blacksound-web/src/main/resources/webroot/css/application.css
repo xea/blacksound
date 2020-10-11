@@ -30,7 +30,7 @@ body {
         width: 13px; }
     body #app .searchbox {
       padding: 10px;
-      height: 100px;
+      height: 125px;
       display: flex;
       flex-direction: column;
       justify-content: space-between; }

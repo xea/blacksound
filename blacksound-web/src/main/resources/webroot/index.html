@@ -27,7 +27,7 @@
             <span v-if="user.streamingEnabled" v-on:click="pauseStreaming" class="btn toggle-play">
               &#10074;&#10074;
             </span>
-            <span v-else v-on:click="startStreaming" class="btn toggle-play">
+            <span v-else v-on:click="resumeStreaming" class="btn toggle-play">
               ▶
             </span>
             <div class="searchbox">
@@ -48,11 +48,16 @@
                         {{ result }}
                     </div>
                 </div>
+                <div>
+                    <select id="device-selector">
+                        <option v-for="device in devices" v-bind:value="device.id" v-on:click="setActiveDevice(device.id)">{{ device.name }} ({{ device.is_active ? 'active' : 'passive' }})</option>
+                    </select>
+                </div>
             </div>
         </div>
         <div class="playlist">
             <div class="playlist-header">
-                Coming up next: {{ playbackPosition }}
+                Coming up next: {{ formattedPlaybackPosition }}
             </div>
             <div class="playlist-items">
                 <div v-for="song in playlist" :key="song.title" class="playlist-item">

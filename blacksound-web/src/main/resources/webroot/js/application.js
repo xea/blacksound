@@ -9,6 +9,7 @@ let vm = new Vue({
             redirectUri: undefined,
             trackUri: undefined
         },
+        devices: [],
         user: {
             hasSession: false,
             name: "Some random dude",
@@ -18,6 +19,10 @@ let vm = new Vue({
         playlist: [
             //{ title: "Metallica / One", uri: "spotify:track:asdfasdf" }
         ],
+        stream: {
+            currentTrackLength: 0,
+            playbackPosition: 0
+        },
         playbackPosition: 0,
         searchExpression: undefined,
         searchResult: undefined
@@ -36,8 +41,16 @@ let vm = new Vue({
                         vm.user.name = response.name;
                         vm.user.streamingEnabled = response.streamingEnabled;
                         vm.spotify.currentTrack = response.currentTrack;
-                        vm.playbackPosition = response.playbackPosition;
+                        vm.stream.currentTrackLength = response.currentTrackLength;
+                        vm.stream.playbackPosition = response.playbackPosition;
+                        vm.devices = response.devices;
                         vm.playlist = response.playlist;
+
+                        if (vm.playlist.length > 0) {
+                            setTimeout(() => {
+                                vm.playlist.shift();
+                            }, (vm.stream.currentTrackLength - vm.stream.playbackPosition) * 1000);
+                        }
                     } else {
                         vm.spotify.redirectUri = response.redirectUri;
                         vm.user.streamingEnabled = false;
@@ -55,16 +68,6 @@ let vm = new Vue({
                     vm.debugMessage = "Playlist loaded";
                 });
         },
-        startStreaming: function() {
-            vm.debugMessage = "Starting streaming";
-
-            fetch("/api/resume")
-                .then(response => response.json())
-                .then(function (response) {
-                    vm.user.streamingEnabled = response.streamingEnabled;
-                    vm.debugMessage = "Streaming started";
-                });
-        },
         pauseStreaming: function() {
             vm.debugMessage = "Pausing streaming";
 
@@ -73,6 +76,16 @@ let vm = new Vue({
                 .then(function (response) {
                     vm.user.streamingEnabled = response.streamingEnabled;
                     vm.debugMessage = "Streaming paused";
+                });
+        },
+        resumeStreaming: function() {
+            vm.debugMessage = "Resuming streaming";
+
+            fetch("/api/resume")
+                .then(response => response.json())
+                .then(function (response) {
+                    vm.user.streamingEnabled = response.streamingEnabled;
+                    vm.debugMessage = "Streaming started";
                 });
         },
         queueTrack: function() {
@@ -102,8 +115,33 @@ let vm = new Vue({
                     vm.debugMessage = "Search completed";
                 });
         },
+        setActiveDevice: function(deviceId) {
+            vm.debugMessage = "Setting active device";
+
+            let request = { deviceId: deviceId };
+
+            fetch("/api/set-device", { method: "POST", body: JSON.stringify(request) })
+                .then(response => response.json())
+                .then(function (response) {
+                    vm.debugMessage = "Active device set";
+                });
+        },
         updatePlaybackPosition: function() {
-            this.playbackPosition += 1;
+            if (this.stream.currentTrackLength > 0) {
+                this.stream.playbackPosition += 1;
+            }
+
+            if (this.stream.playbackPosition >= this.stream.currentTrackLength) {
+                this.stream.playbackPosition = 0;
+            }
+        }
+    },
+    computed: {
+        formattedPlaybackPosition: function() {
+            let minutes = "" + Math.trunc(this.stream.playbackPosition / 60);
+            let seconds = ("" + this.stream.playbackPosition % 60).padStart(2, '0');
+
+            return minutes + ":" + seconds;
         }
     },
     mounted: function() {

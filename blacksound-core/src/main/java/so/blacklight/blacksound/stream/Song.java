@@ -28,6 +28,13 @@ public class Song {
                 .collect(Collectors.joining(","));
     }
 
+    public Song(final String trackUri, final String artist, final String title, final long length) {
+        this.trackUri = trackUri;
+        this.artist = artist;
+        this.title = title;
+        this.length = length;
+    }
+
     public String getUri() {
         return trackUri;
     }

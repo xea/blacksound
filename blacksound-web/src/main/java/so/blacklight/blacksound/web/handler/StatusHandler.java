@@ -1,5 +1,6 @@
 package so.blacklight.blacksound.web.handler;
 
+import com.wrapper.spotify.model_objects.miscellaneous.Device;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.ext.web.RoutingContext;
@@ -12,6 +13,8 @@ import so.blacklight.blacksound.stream.Song;
 import so.blacklight.blacksound.subscriber.Subscriber;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class StatusHandler extends AuthenticatedHandler {
@@ -33,11 +36,16 @@ public class StatusHandler extends AuthenticatedHandler {
 
     private StatusResponse authenticatedResponse(final Subscriber subscriber) {
         final var name = subscriber.getProfileName();
-        final var currentTrack = subscriber.getCurrentTrack();
+        final var currentTrack = Optional.ofNullable(core.getChannel().currentTrack())
+                .orElse(new Song(null, "None", "None", 0));
+
+        final var currentTrackTitle = currentTrack.getFullTitle();
+        final var currentTrackLength = currentTrack.getLength(TimeUnit.SECONDS);
         final var playbackPosition = core.getChannel().getPlaybackPosition();
         final var playlist = core.getChannel().getPlaylist();
+        final var devices = subscriber.getDevices();
 
-        return new AuthenticatedStatusResponse(name, subscriber.isStreamingEnabled(), currentTrack, playbackPosition, playlist);
+        return new AuthenticatedStatusResponse(name, subscriber.isStreamingEnabled(), currentTrackTitle, currentTrackLength, playbackPosition, playlist, devices);
     }
 
     /**
@@ -60,16 +68,20 @@ public class StatusHandler extends AuthenticatedHandler {
         public final boolean streamingEnabled;
         public final int playbackPosition;
         public final String currentTrack;
+        public final long currentTrackLength;
         public final List<String> playlist;
+        public final List<Device> devices;
 
-        public AuthenticatedStatusResponse(final String name, final boolean streamingEnabled, final String currentTrack, final int playbackPosition, final List<Song> playlist) {
+        public AuthenticatedStatusResponse(final String name, final boolean streamingEnabled, final String currentTrack, final long currentTrackLength, final int playbackPosition, final List<Song> playlist, final List<Device> devices) {
             super(true);
 
             this.name = name;
             this.streamingEnabled = streamingEnabled;
             this.currentTrack = currentTrack;
+            this.currentTrackLength = currentTrackLength;
             this.playbackPosition = playbackPosition;
             this.playlist = playlist.stream().map(Song::getPrettyTitle).collect(Collectors.toList());
+            this.devices = devices;
         }
 
     }

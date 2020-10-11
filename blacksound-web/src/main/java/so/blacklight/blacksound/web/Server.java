@@ -90,6 +90,7 @@ public class Server {
         router.route("/api/redirect-uri").handler(new RedirectURIHandler(core));
         router.route("/api/status").handler(new StatusHandler(core, vertx, crypto));
 
+        router.route("/api/set-device").handler(BodyHandler.create()).handler(new SetActiveDeviceHandler(core, vertx, crypto));
 
         // TODO we'll need to hide this call behind an authorization check once we've got users
         router.route("/api/shutdown").handler(new ShutDownHandler(this));

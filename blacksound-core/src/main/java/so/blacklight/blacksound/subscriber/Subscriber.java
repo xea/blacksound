@@ -1,18 +1,24 @@
 package so.blacklight.blacksound.subscriber;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
 import com.wrapper.spotify.SpotifyApi;
+import com.wrapper.spotify.exceptions.SpotifyWebApiException;
+import com.wrapper.spotify.model_objects.miscellaneous.Device;
 import com.wrapper.spotify.model_objects.specification.Track;
 import com.wrapper.spotify.model_objects.specification.User;
 import io.vavr.control.Try;
 import io.vavr.control.Validation;
+import org.apache.hc.core5.http.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import so.blacklight.blacksound.id.Identifiable;
 import so.blacklight.blacksound.stream.Song;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * An instance of a subscriber represents a user who had authenticated with spotify
@@ -26,6 +32,8 @@ public class Subscriber implements Identifiable<SubscriberId> {
     private final SpotifyApi api;
     private boolean streamingEnabled;
     private Instant expires;
+
+    private String activeDeviceId;
 
     private final Logger log = LogManager.getLogger(getClass());
 
@@ -132,5 +140,65 @@ public class Subscriber implements Identifiable<SubscriberId> {
 
     public void enableStreaming() {
         streamingEnabled = ENABLED;
+    }
+
+    public void playSong(final Song song) {
+        playSong(song.getUri());
+    }
+
+    public void playSong(final String trackUri) {
+        final var playRequest = getApi()
+                .startResumeUsersPlayback()
+                .uris(JsonParser.parseString("[ \"" + trackUri + "\" ]").getAsJsonArray())
+                .build();
+
+        try {
+            playRequest.execute();
+        } catch (ParseException | IOException | SpotifyWebApiException e) {
+            log.error("Error while playing song", e);
+        }
+    }
+
+    public void seekTrack(int playbackPosition) {
+        final var seekRequest = getApi()
+                .seekToPositionInCurrentlyPlayingTrack(playbackPosition * 1000)
+                .build();
+
+        try {
+            seekRequest.execute();
+        } catch (ParseException | SpotifyWebApiException | IOException e) {
+            log.error("Error while seeking into the song");
+        }
+    }
+
+    public List<Device> getDevices() {
+        final var devicesRequest = getApi().getUsersAvailableDevices().build();
+
+        try {
+            final Device[] devices = devicesRequest.execute();
+
+            Arrays.sort(devices, Comparator.comparing(Device::getIs_active).reversed());
+
+            return Arrays.asList(devices);
+        } catch (ParseException | IOException | SpotifyWebApiException e) {
+            log.error("Error finding devices", e);
+        }
+
+        return Collections.emptyList();
+    }
+
+    public void setActiveDevice(final String deviceId) {
+        JsonArray deviceIds = new JsonArray();
+        deviceIds.add(deviceId);
+
+        final var setDeviceRequest = getApi().transferUsersPlayback(deviceIds).build();
+
+        activeDeviceId = deviceId;
+
+        try {
+            setDeviceRequest.execute();
+        } catch (ParseException | SpotifyWebApiException | IOException e) {
+            log.error("Error setting active device {}", e.getMessage());
+        }
     }
 }

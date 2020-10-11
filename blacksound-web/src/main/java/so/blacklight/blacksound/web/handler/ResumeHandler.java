@@ -19,6 +19,8 @@ public class ResumeHandler extends AuthenticatedHandler {
         log.info("Resume request received");
 
         subscriber.enableStreaming();
+        subscriber.playSong(core.getChannel().currentTrack());
+        subscriber.seekTrack(core.getChannel().getPlaybackPosition());
 
         final var response = routingContext.response();
 

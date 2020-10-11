@@ -120,18 +120,7 @@ public class StreamingCore {
     }
 
     public void playTrack(final String trackUri) {
-        subscribers.forEach(subscriber -> {
-            final var playRequest = subscriber.getApi()
-                    .startResumeUsersPlayback()
-                    .uris(JsonParser.parseString("[ \"" + trackUri + "\" ]").getAsJsonArray())
-                    .build();
-
-            try {
-                playRequest.execute();
-            } catch (ParseException | IOException | SpotifyWebApiException e) {
-                log.error("Error while playing song", e);
-            }
-        });
+        subscribers.forEach(subscriber -> subscriber.playSong(trackUri));
     }
 
     public boolean queue(final Song song) {
