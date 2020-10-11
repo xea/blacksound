@@ -25,6 +25,9 @@ body {
       padding: 10px;
       display: flex;
       justify-content: space-between; }
+      body #app .controls .toggle-play {
+        height: max-content;
+        width: 13px; }
     body #app .searchbox {
       padding: 10px;
       height: 100px;

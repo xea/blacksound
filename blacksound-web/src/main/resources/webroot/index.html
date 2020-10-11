@@ -24,10 +24,10 @@
             </div>
         </div>
         <div v-if="user.hasSession" class="controls">
-            <span v-if="user.streamingEnabled" v-on:click="pauseStreaming" class="btn">
+            <span v-if="user.streamingEnabled" v-on:click="pauseStreaming" class="btn toggle-play">
               &#10074;&#10074;
             </span>
-            <span v-else v-on:click="startStreaming" class="btn">
+            <span v-else v-on:click="startStreaming" class="btn toggle-play">
               ▶
             </span>
             <div class="searchbox">
@@ -52,7 +52,7 @@
         </div>
         <div class="playlist">
             <div class="playlist-header">
-                Coming up next:
+                Coming up next: {{ playbackPosition }}
             </div>
             <div class="playlist-items">
                 <div v-for="song in playlist" :key="song.title" class="playlist-item">

@@ -10,10 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -47,7 +44,9 @@ public class FileSubscriberStore implements SubscriberStore {
         try (final var fileReader = Files.newBufferedReader(storePath)) {
             final var typeToken = new TypeToken<Set<SubscriberHandle>>() {};
 
-            return new Gson().fromJson(fileReader, typeToken.getType());
+            final Set<SubscriberHandle> rawResponse = new Gson().fromJson(fileReader, typeToken.getType());
+
+            return Optional.ofNullable(rawResponse).orElse(Collections.emptySet());
         } catch (IOException e) {
             log.error("Error while loading subscribers from file store: {}", e.getMessage());
         }

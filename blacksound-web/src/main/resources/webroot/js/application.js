@@ -18,6 +18,7 @@ let vm = new Vue({
         playlist: [
             //{ title: "Metallica / One", uri: "spotify:track:asdfasdf" }
         ],
+        playbackPosition: 0,
         searchExpression: undefined,
         searchResult: undefined
     },
@@ -35,6 +36,7 @@ let vm = new Vue({
                         vm.user.name = response.name;
                         vm.user.streamingEnabled = response.streamingEnabled;
                         vm.spotify.currentTrack = response.currentTrack;
+                        vm.playbackPosition = response.playbackPosition;
                         vm.playlist = response.playlist;
                     } else {
                         vm.spotify.redirectUri = response.redirectUri;
@@ -99,9 +101,15 @@ let vm = new Vue({
 
                     vm.debugMessage = "Search completed";
                 });
+        },
+        updatePlaybackPosition: function() {
+            this.playbackPosition += 1;
         }
     },
     mounted: function() {
+        setInterval(() => {
+            this.updatePlaybackPosition();
+        }, 1000);
         this.$nextTick(function() {
             this.init();
         })

@@ -4,6 +4,7 @@ import io.vavr.control.Option;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -73,5 +74,13 @@ public class Channel {
         playlist.addAll(queue);
 
         return playlist;
+    }
+
+    public int getPlaybackPosition() {
+        return Optional.ofNullable(currentTrackStartTime)
+                .map(startTime -> Duration.between(startTime, Instant.now()))
+                .map(Duration::getSeconds)
+                .map(Long::intValue)
+                .orElse(0);
     }
 }

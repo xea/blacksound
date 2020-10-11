@@ -39,4 +39,11 @@ public class Song {
     public String getFullTitle() {
         return String.format("%s / %s", artist, title);
     }
+
+    public String getPrettyTitle() {
+        final var lenghtMinutes = length / 60;
+        final var lengthSeconds = length % 60;
+
+        return String.format("%s [%d:%02d]", getFullTitle(), lenghtMinutes, lengthSeconds);
+    }
 }

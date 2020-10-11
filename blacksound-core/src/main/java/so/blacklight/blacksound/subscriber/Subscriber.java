@@ -25,7 +25,7 @@ public class Subscriber implements Identifiable<SubscriberId> {
     private final SubscriberId id;
     private final SpotifyApi api;
     private boolean streamingEnabled;
-    Instant expires;
+    private Instant expires;
 
     private final Logger log = LogManager.getLogger(getClass());
 

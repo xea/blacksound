@@ -2,7 +2,7 @@
   "$schema": "config.schema.json",
 
   "network": {
-    "applicationUri": "https://localhost:9861/",
+    "applicationUri": "https://stream.blacklight.so/",
     "listenPort": 9861,
     "workerPoolSize": 16
   },
