@@ -81,7 +81,7 @@ public class Server {
 
         router.route("/api/next-song").handler(new NextSongHandler());
         router.route("/api/play").handler(BodyHandler.create()).handler(new PlayHandler(core, vertx));
-        router.route("/api/pause").handler(new PauseHandler(core, vertx));
+        router.route("/api/pause").handler(new PauseHandler(core, vertx, crypto));
         router.route("/api/queue").handler(BodyHandler.create()).handler(new QueueHandler(core, vertx, crypto));
         router.route("/api/playlist").handler(new PlaylistHandler(core, vertx));
         router.route("/api/resume").handler(new ResumeHandler(core, vertx, crypto));

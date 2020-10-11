@@ -49,7 +49,7 @@ public class Channel {
     }
 
     private void nextSong() {
-        final var nextTrack = queue.pop();
+        final var nextTrack = queue.pollFirst();
 
         if (Objects.nonNull(nextTrack)) {
             log.info("Playing next song: {}", nextTrack.getFullTitle());

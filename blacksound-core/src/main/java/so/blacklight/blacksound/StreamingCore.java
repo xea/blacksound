@@ -120,7 +120,9 @@ public class StreamingCore {
     }
 
     public void playTrack(final String trackUri) {
-        subscribers.forEach(subscriber -> subscriber.playSong(trackUri));
+        subscribers.stream()
+                .filter(Subscriber::isStreamingEnabled)
+                .forEach(subscriber -> subscriber.playSong(trackUri));
     }
 
     public boolean queue(final Song song) {
@@ -128,7 +130,7 @@ public class StreamingCore {
     }
 
     public void play() {
-        subscribers.forEach(subscriber -> {
+        subscribers.stream().filter(Subscriber::isStreamingEnabled).forEach(subscriber -> {
             final var playRequest = subscriber.getApi().startResumeUsersPlayback().build();
 
             try {
@@ -141,17 +143,7 @@ public class StreamingCore {
     }
 
     public void pause() {
-        subscribers.forEach(subscriber -> {
-            final var pauseRequest = subscriber.getApi().pauseUsersPlayback().build();
-
-            try {
-                final var result = pauseRequest.execute();
-
-                log.debug("Pause request result: {}", result);
-            } catch (ParseException | SpotifyWebApiException | IOException e) {
-                log.error("Error during pause", e);
-            }
-        });
+        subscribers.stream().filter(s -> !s.isStreamingEnabled()).forEach(Subscriber::pause);
     }
 
     private void refreshSubscribers() {

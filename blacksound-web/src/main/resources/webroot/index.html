@@ -55,7 +55,7 @@
                 </div>
             </div>
         </div>
-        <div class="playlist">
+        <div class="playlist" v-if="isStreaming">
             <div class="playlist-header">
                 Coming up next: {{ formattedPlaybackPosition }}
             </div>
@@ -63,6 +63,11 @@
                 <div v-for="song in playlist" :key="song.title" class="playlist-item">
                     {{ song }}
                 </div>
+            </div>
+        </div>
+        <div class="playlist" v-else>
+            <div class="playlist-header">
+                There are no songs in the playlist currently
             </div>
         </div>
         <div class="debugBar">

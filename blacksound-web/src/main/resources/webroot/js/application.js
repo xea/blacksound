@@ -14,7 +14,7 @@ let vm = new Vue({
             hasSession: false,
             name: "Some random dude",
             logoutUri: "/api/logout",
-            streamingEnabled: undefined
+            streamingEnabled: false
         },
         playlist: [
             //{ title: "Metallica / One", uri: "spotify:track:asdfasdf" }
@@ -23,7 +23,6 @@ let vm = new Vue({
             currentTrackLength: 0,
             playbackPosition: 0
         },
-        playbackPosition: 0,
         searchExpression: undefined,
         searchResult: undefined
     },
@@ -45,12 +44,6 @@ let vm = new Vue({
                         vm.stream.playbackPosition = response.playbackPosition;
                         vm.devices = response.devices;
                         vm.playlist = response.playlist;
-
-                        if (vm.playlist.length > 0) {
-                            setTimeout(() => {
-                                vm.playlist.shift();
-                            }, (vm.stream.currentTrackLength - vm.stream.playbackPosition) * 1000);
-                        }
                     } else {
                         vm.spotify.redirectUri = response.redirectUri;
                         vm.user.streamingEnabled = false;
@@ -99,6 +92,8 @@ let vm = new Vue({
                     vm.playlist = response.playlist;
                     vm.spotify.trackUri = undefined;
                     vm.debugMessage = "Track queued";
+
+                    vm.init();
                 });
         },
         searchSong: function() {
@@ -133,6 +128,10 @@ let vm = new Vue({
 
             if (this.stream.playbackPosition >= this.stream.currentTrackLength) {
                 this.stream.playbackPosition = 0;
+
+                if (this.playlist.length > 0) {
+                    this.playlist.shift();
+                }
             }
         }
     },
@@ -142,12 +141,13 @@ let vm = new Vue({
             let seconds = ("" + this.stream.playbackPosition % 60).padStart(2, '0');
 
             return minutes + ":" + seconds;
+        },
+        isStreaming: function () {
+            return this.playlist.length > 0;
         }
     },
     mounted: function() {
-        setInterval(() => {
-            this.updatePlaybackPosition();
-        }, 1000);
+        setInterval(() => this.updatePlaybackPosition(), 1000);
         this.$nextTick(function() {
             this.init();
         })

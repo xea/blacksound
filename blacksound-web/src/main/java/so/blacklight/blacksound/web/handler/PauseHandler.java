@@ -5,29 +5,23 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.ext.web.RoutingContext;
 import org.apache.hc.core5.http.ContentType;
 import so.blacklight.blacksound.StreamingCore;
+import so.blacklight.blacksound.crypto.Crypto;
+import so.blacklight.blacksound.subscriber.Subscriber;
 
-import java.util.concurrent.CompletableFuture;
+public class PauseHandler extends AuthenticatedHandler {
 
-public class PauseHandler implements VertxHandler {
-
-    private final StreamingCore core;
-    private final Vertx vertx;
-
-    public PauseHandler(final StreamingCore core, final Vertx vertx) {
-        this.core = core;
-        this.vertx = vertx;
+    public PauseHandler(StreamingCore core, Vertx vertx, Crypto crypto) {
+        super(core, vertx, crypto);
     }
 
     @Override
-    public void handle(final RoutingContext routingContext) {
-        CompletableFuture.runAsync(() -> {
-            core.pause();
+    public void handle(RoutingContext routingContext, Subscriber subscriber) {
+        subscriber.disableStreaming();
+        subscriber.pause();
 
-            final var response = routingContext.response();
-            response.putHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
-            response.end(asJson(new ResumeResponse("ok", false)));
-        }, vertx.nettyEventLoopGroup());
-
+        final var response = routingContext.response();
+        response.putHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+        response.end(asJson(new ResumeResponse("ok", subscriber.isStreamingEnabled())));
     }
 
     private static class ResumeResponse {

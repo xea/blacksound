@@ -44,8 +44,9 @@ public class StatusHandler extends AuthenticatedHandler {
         final var playbackPosition = core.getChannel().getPlaybackPosition();
         final var playlist = core.getChannel().getPlaylist();
         final var devices = subscriber.getDevices();
+        final var streamingEnabled = subscriber.isStreamingEnabled();
 
-        return new AuthenticatedStatusResponse(name, subscriber.isStreamingEnabled(), currentTrackTitle, currentTrackLength, playbackPosition, playlist, devices);
+        return new AuthenticatedStatusResponse(name, streamingEnabled, currentTrackTitle, currentTrackLength, playbackPosition, playlist, devices);
     }
 
     /**

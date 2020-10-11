@@ -34,6 +34,7 @@ public class Subscriber implements Identifiable<SubscriberId> {
     private Instant expires;
 
     private String activeDeviceId;
+    private String profileNameCache;
 
     private final Logger log = LogManager.getLogger(getClass());
 
@@ -97,9 +98,12 @@ public class Subscriber implements Identifiable<SubscriberId> {
     }
 
     public String getProfileName() {
-        return Try.of(() -> api.getCurrentUsersProfile().build().execute())
-                .map(User::getDisplayName)
-                .getOrElse("Unidentified user :(");
+        return Optional.ofNullable(profileNameCache)
+                .orElseGet(() ->
+                        Try.of(() -> api.getCurrentUsersProfile().build().execute())
+                                .map(User::getDisplayName)
+                                .peek(name -> profileNameCache = name)
+                                .getOrElse("Unidentified user :("));
     }
 
     public String getCurrentTrack() {
@@ -140,6 +144,10 @@ public class Subscriber implements Identifiable<SubscriberId> {
 
     public void enableStreaming() {
         streamingEnabled = ENABLED;
+    }
+
+    public void disableStreaming() {
+        streamingEnabled = DISABLED;
     }
 
     public void playSong(final Song song) {
@@ -199,6 +207,18 @@ public class Subscriber implements Identifiable<SubscriberId> {
             setDeviceRequest.execute();
         } catch (ParseException | SpotifyWebApiException | IOException e) {
             log.error("Error setting active device {}", e.getMessage());
+        }
+    }
+
+    public void pause() {
+        final var pauseRequest = getApi().pauseUsersPlayback().build();
+
+        try {
+            final var result = pauseRequest.execute();
+
+            log.debug("Pause request result: {}", result);
+        } catch (ParseException | SpotifyWebApiException | IOException e) {
+            log.error("Error during pause", e);
         }
     }
 }
