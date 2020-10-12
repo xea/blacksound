@@ -35,6 +35,7 @@ public class Subscriber implements Identifiable<SubscriberId> {
 
     private String activeDeviceId;
     private String profileNameCache;
+    private List<Device> devicesCache;
 
     private final Logger log = LogManager.getLogger(getClass());
 
@@ -196,20 +197,26 @@ public class Subscriber implements Identifiable<SubscriberId> {
     }
 
     public List<Device> setActiveDevice(final String deviceId) {
-        JsonArray deviceIds = new JsonArray();
-        deviceIds.add(deviceId);
+        if (Objects.isNull(activeDeviceId) || !activeDeviceId.equalsIgnoreCase(deviceId)) {
+            final var deviceIds = new JsonArray();
+            deviceIds.add(deviceId);
 
-        final var setDeviceRequest = getApi().transferUsersPlayback(deviceIds).build();
+            final var setDeviceRequest = getApi().transferUsersPlayback(deviceIds).build();
 
-        activeDeviceId = deviceId;
+            activeDeviceId = deviceId;
 
-        try {
-            setDeviceRequest.execute();
-        } catch (ParseException | SpotifyWebApiException | IOException e) {
-            log.error("Error setting active device {}", e.getMessage());
+            try {
+                setDeviceRequest.execute();
+            } catch (ParseException | SpotifyWebApiException | IOException e) {
+                log.error("Error setting active device {}", e.getMessage());
+            }
         }
 
-        return getDevices();
+        if (Objects.isNull(devicesCache)) {
+            devicesCache = getDevices();
+        }
+
+        return devicesCache;
     }
 
     public void pause() {

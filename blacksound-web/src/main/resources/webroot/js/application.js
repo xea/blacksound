@@ -149,6 +149,7 @@ let vm = new Vue({
     },
     mounted: function() {
         setInterval(() => this.updatePlaybackPosition(), 1000);
+        setInterval(() => this.init(), 5000);
         this.$nextTick(function() {
             this.init();
         })
