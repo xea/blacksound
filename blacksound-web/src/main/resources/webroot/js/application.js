@@ -110,10 +110,10 @@ let vm = new Vue({
                     vm.debugMessage = "Search completed";
                 });
         },
-        setActiveDevice: function(deviceId) {
+        setActiveDevice: function(event) {
             vm.debugMessage = "Setting active device";
 
-            let request = { deviceId: deviceId };
+            let request = { deviceId: event.target.value };
 
             fetch("/api/set-device", { method: "POST", body: JSON.stringify(request) })
                 .then(response => response.json())
