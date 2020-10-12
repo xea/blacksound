@@ -1,36 +1,31 @@
 package so.blacklight.blacksound.web.handler;
 
+import com.google.gson.Gson;
+import com.wrapper.spotify.model_objects.specification.Track;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
 import so.blacklight.blacksound.StreamingCore;
+import so.blacklight.blacksound.crypto.Crypto;
+import so.blacklight.blacksound.subscriber.Subscriber;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
-public class SearchHandler implements VertxHandler {
+public class SearchHandler extends AuthenticatedHandler {
 
-    private final StreamingCore core;
-    private final Vertx vertx;
-
-    public SearchHandler(final StreamingCore core, final Vertx vertx) {
-        this.core = core;
-        this.vertx = vertx;
+    public SearchHandler(final StreamingCore core, final Vertx vertx, final Crypto crypto) {
+        super(core, vertx, crypto);
     }
 
     @Override
-    public void handle(final RoutingContext routingContext) {
-        CompletableFuture.runAsync(() -> {
-            final var result = new ArrayList<String>();
-            result.add("Metallica / One");
-            result.add("Slayer / Raining blood");
-            result.add("Justin Bieber / You too");
+    public void handle(RoutingContext routingContext, Subscriber subscriber) {
+        final var request = new Gson().fromJson(routingContext.getBodyAsString(), SearchRequest.class);
+        final var result = core.lookupSongs(request.searchExpression);
+        final var response = routingContext.response();
 
-            final var response = routingContext.response();
-
-            response.end(asJson(new SearchResponse(result)));
-
-        }, vertx.nettyEventLoopGroup());
+        response.end(asJson(new SearchResponse(result.stream().map(Track::getName).collect(Collectors.toList()))));
     }
 
     private static class SearchRequest {

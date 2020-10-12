@@ -85,7 +85,7 @@ public class Server {
         router.route("/api/queue").handler(BodyHandler.create()).handler(new QueueHandler(core, vertx, crypto));
         router.route("/api/playlist").handler(new PlaylistHandler(core, vertx));
         router.route("/api/resume").handler(new ResumeHandler(core, vertx, crypto));
-        router.route("/api/search").handler(BodyHandler.create()).handler(new SearchHandler(core, vertx));
+        router.route("/api/search").handler(BodyHandler.create()).handler(new SearchHandler(core, vertx, crypto));
         // This exposes our redirect URI to the frontend
         router.route("/api/redirect-uri").handler(new RedirectURIHandler(core));
         router.route("/api/status").handler(new StatusHandler(core, vertx, crypto));

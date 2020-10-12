@@ -4,6 +4,9 @@ import com.google.gson.JsonParser;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredentials;
+import com.wrapper.spotify.model_objects.specification.Paging;
+import com.wrapper.spotify.model_objects.specification.Track;
+import com.wrapper.spotify.requests.data.search.simplified.SearchTracksRequest;
 import io.vavr.control.Option;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.logging.log4j.LogManager;
@@ -20,6 +23,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -175,5 +180,19 @@ public class StreamingCore {
 
     public Channel getChannel() {
         return channel;
+    }
+
+    public List<Track> lookupSongs(String searchExpression) {
+        SearchTracksRequest build = spotifyApi.searchTracks(searchExpression).limit(5).build();
+
+        try {
+            final Paging<Track> result = build.execute();
+
+            return Arrays.asList(result.getItems());
+        } catch (ParseException | SpotifyWebApiException | IOException e) {
+            log.error("Error during song lookup", e);
+        }
+
+        return Collections.emptyList();
     }
 }
