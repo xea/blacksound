@@ -24,7 +24,8 @@ let vm = new Vue({
             playbackPosition: 0
         },
         searchExpression: undefined,
-        searchResult: undefined
+        searchResult: undefined,
+        activeUsers: []
     },
     methods: {
         init: function() {
@@ -44,6 +45,7 @@ let vm = new Vue({
                         vm.stream.playbackPosition = response.playbackPosition;
                         vm.devices = response.devices;
                         vm.playlist = response.playlist;
+                        vm.activeUsers = response.activeUsers;
                     } else {
                         vm.spotify.redirectUri = response.redirectUri;
                         vm.user.streamingEnabled = false;

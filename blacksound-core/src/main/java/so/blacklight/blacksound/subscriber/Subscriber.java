@@ -16,6 +16,7 @@ import so.blacklight.blacksound.id.Identifiable;
 import so.blacklight.blacksound.stream.Song;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -28,10 +29,13 @@ public class Subscriber implements Identifiable<SubscriberId> {
     public static final boolean ENABLED = true;
     public static final boolean DISABLED = false;
 
+    private static final int ACTIVE_THRESHOLD = 15;
+
     private final SubscriberId id;
     private final SpotifyApi api;
     private boolean streamingEnabled;
     private Instant expires;
+    private Instant lastSeen;
 
     private String activeDeviceId;
     private String profileNameCache;
@@ -44,6 +48,7 @@ public class Subscriber implements Identifiable<SubscriberId> {
         this.api = api;
         this.expires = expires;
         this.streamingEnabled = streamingEnabled;
+        this.lastSeen = Instant.now();
     }
 
     @Override
@@ -229,5 +234,13 @@ public class Subscriber implements Identifiable<SubscriberId> {
         } catch (ParseException | SpotifyWebApiException | IOException e) {
             log.error("Error during pause", e);
         }
+    }
+
+    public boolean isActive() {
+        return Duration.between(lastSeen, Instant.now()).getSeconds() < ACTIVE_THRESHOLD;
+    }
+
+    public void updateSeen() {
+        lastSeen = Instant.now();
     }
 }

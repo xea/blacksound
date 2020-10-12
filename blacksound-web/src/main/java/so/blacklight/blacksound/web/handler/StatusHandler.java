@@ -45,8 +45,11 @@ public class StatusHandler extends AuthenticatedHandler {
         final var playlist = core.getChannel().getPlaylist();
         final var devices = subscriber.getDevices();
         final var streamingEnabled = subscriber.isStreamingEnabled();
+        final var activeUsers = core.getActiveSubscribers();
 
-        return new AuthenticatedStatusResponse(name, streamingEnabled, currentTrackTitle, currentTrackLength, playbackPosition, playlist, devices);
+        subscriber.updateSeen();
+
+        return new AuthenticatedStatusResponse(name, streamingEnabled, currentTrackTitle, currentTrackLength, playbackPosition, playlist, devices, activeUsers);
     }
 
     /**
@@ -72,8 +75,9 @@ public class StatusHandler extends AuthenticatedHandler {
         public final long currentTrackLength;
         public final List<String> playlist;
         public final List<Device> devices;
+        public final List<String> activeUsers;
 
-        public AuthenticatedStatusResponse(final String name, final boolean streamingEnabled, final String currentTrack, final long currentTrackLength, final int playbackPosition, final List<Song> playlist, final List<Device> devices) {
+        public AuthenticatedStatusResponse(final String name, final boolean streamingEnabled, final String currentTrack, final long currentTrackLength, final int playbackPosition, final List<Song> playlist, final List<Device> devices, final List<String> activeUsers) {
             super(true);
 
             this.name = name;
@@ -83,6 +87,7 @@ public class StatusHandler extends AuthenticatedHandler {
             this.playbackPosition = playbackPosition;
             this.playlist = playlist.stream().map(Song::getPrettyTitle).collect(Collectors.toList());
             this.devices = devices;
+            this.activeUsers = activeUsers;
         }
 
     }

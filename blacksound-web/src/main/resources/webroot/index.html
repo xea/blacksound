@@ -70,6 +70,14 @@
                 There are no songs in the playlist currently
             </div>
         </div>
+        <div class="playlist">
+            <div class="playlist-header">
+                Active users:
+            </div>
+            <ul>
+                <li v-for="user in activeUsers">{{user}}</li>
+            </ul>
+        </div>
         <div class="debugBar">
             {{ debugMessage }}
         </div>

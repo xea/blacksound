@@ -1,6 +1,5 @@
 package so.blacklight.blacksound;
 
-import com.google.gson.JsonParser;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredentials;
@@ -194,5 +193,13 @@ public class StreamingCore {
         }
 
         return Collections.emptyList();
+    }
+
+    public List<String> getActiveSubscribers() {
+        return subscribers.stream()
+                .filter(Subscriber::isActive)
+                .map(Subscriber::getProfileName)
+                .sorted()
+                .collect(Collectors.toList());
     }
 }
