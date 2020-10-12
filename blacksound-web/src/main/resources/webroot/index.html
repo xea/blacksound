@@ -50,7 +50,7 @@
                 </div>
                 <div>
                     <select id="device-selector">
-                        <option v-for="device in devices" v-bind:value="device.id" v-on:click="setActiveDevice(device.id)">{{ device.name }} ({{ device.is_active ? 'active' : 'passive' }})</option>
+                        <option v-for="device in devices" v-bind:value="device.id" v-on:change="setActiveDevice(device.id)">{{ device.name }} ({{ device.is_active ? 'active' : 'passive' }})</option>
                     </select>
                 </div>
             </div>
