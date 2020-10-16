@@ -22,7 +22,7 @@
         <log4j.version>2.13.3</log4j.version>
         <resiliency4j.version>1.4.0</resiliency4j.version>
         <spotify-web-api.version>6.4.0</spotify-web-api.version>
-        <tink.version>1.4.0-rc2</tink.version>
+        <tink.version>1.5.0</tink.version>
         <vavr.version>1.0.0-alpha-3</vavr.version>
         <vertx.version>3.9.0</vertx.version>
 
